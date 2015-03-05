@@ -34,8 +34,8 @@ struct range_struct
 {
     /** the name of the range's property */
 	char *name;
-    /** the mapped html tag name */
-    char *html_name;
+    /** the mapped tag name */
+    char *tag_name;
     /** absolute start offset in the text */
 	int start;
     /** relative offset */
@@ -115,7 +115,7 @@ range *range_create_empty()
  */
 range *range_copy( range *r )
 {
-    range *r2 = range_create( r->name, r->html_name, r->start, r->len );
+    range *r2 = range_create( r->name, r->tag_name, r->start, r->len );
     if ( r2 != NULL )
     {
         annotation *a = r->annotations;
@@ -135,19 +135,19 @@ range *range_copy( range *r )
 /**
  * Create a single range
  * @param name the name of the property
- * @param html_name the range's mapped html name
+ * @param tag_name the range's mapped tag name
  * @param start its start offset inside the text
  * @param len its length
  * @return the finished range
  */
-range *range_create( char *name, char *html_name, int start, int len )
+range *range_create( char *name, char *tag_name, int start, int len )
 {
     range *r = calloc( 1, sizeof(range) );
 	if ( r != NULL )
     {
         r->name = strdup(name);
-        if ( html_name != NULL )
-            r->html_name = strdup( html_name );
+        if ( tag_name != NULL )
+            r->tag_name = strdup( tag_name );
         r->start = start;
         r->len = len;
         r->rightmost = 1;
@@ -167,10 +167,10 @@ void range_dispose( range *r )
         free( r->name );
         r->name = NULL;
     }
-    if ( r->html_name != NULL )
+    if ( r->tag_name != NULL )
     {
-        free( r->html_name );
-        r->html_name = NULL;
+        free( r->tag_name );
+        r->tag_name = NULL;
     }
     annotation *a = r->annotations;
     while ( a != NULL )
@@ -248,30 +248,30 @@ char *range_name( range *r )
     return r->name;
 }
 /**
- * Get this range's html name
+ * Get this range's tag name
  * @param r the range in question
  * @return the name as a string
  */
-char *range_html_name( range *r )
+char *range_tag_name( range *r )
 {
-    return r->html_name;
+    return r->tag_name;
 }
 /**
- * Set the html name of the range post factum (normal case)
+ * Set the tag name of the range post factum (normal case)
  * @param r the range
- * @param html_name name of the range in html
+ * @param tag_name name of the range in output format
  * @return 1 if it worked, else 0
  */
-int range_set_html_name( range *r, char *html_name )
+int range_set_tag_name( range *r, char *tag_name )
 {
-    if ( r->html_name != NULL )
+    if ( r->tag_name != NULL )
     {
-        free( r->html_name );
-        r->html_name = NULL;
+        free( r->tag_name );
+        r->tag_name = NULL;
     }
-    if ( html_name != NULL )
-        r->html_name = strdup( html_name );
-    return r->html_name != NULL;
+    if ( tag_name != NULL )
+        r->tag_name = strdup( tag_name );
+    return r->tag_name != NULL;
 }
 /**
  * Is a range inside another. Inside can be equal
@@ -435,7 +435,7 @@ range *range_split_delete( range *r, range *q )
     }
     else
     {
-        range *q2 = range_create( r->name, r->html_name, r->start, r->len );
+        range *q2 = range_create( r->name, r->tag_name, r->start, r->len );
         if ( q2 != NULL )
         {
             q2->start = range_end(q);

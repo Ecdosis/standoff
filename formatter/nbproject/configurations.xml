@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="88">
+<configurationDescriptor version="90">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -12,12 +12,15 @@
         <itemPath>include/STIL/cJSON.h</itemPath>
         <itemPath>include/STIL/memory.h</itemPath>
       </logicalFolder>
-      <itemPath>include/aeseserver_AeseFormatter.h</itemPath>
+      <itemPath>include/HTML.h</itemPath>
+      <itemPath>include/MARKDOWN.h</itemPath>
+      <itemPath>include/XML.h</itemPath>
       <itemPath>include/amigaconfig.h</itemPath>
       <itemPath>include/annotation.h</itemPath>
       <itemPath>include/ascii.h</itemPath>
       <itemPath>include/asciitab.h</itemPath>
       <itemPath>include/attribute.h</itemPath>
+      <itemPath>include/calliope_AeseFormatter.h</itemPath>
       <itemPath>include/css_parse.h</itemPath>
       <itemPath>include/css_property.h</itemPath>
       <itemPath>include/css_rule.h</itemPath>
@@ -41,6 +44,7 @@
       <itemPath>include/memwatch.h</itemPath>
       <itemPath>include/nametab.h</itemPath>
       <itemPath>include/node.h</itemPath>
+      <itemPath>include/output.h</itemPath>
       <itemPath>include/plain_text.h</itemPath>
       <itemPath>include/queue.h</itemPath>
       <itemPath>include/range.h</itemPath>
@@ -69,6 +73,8 @@
         <itemPath>src/STIL/memory.c</itemPath>
       </logicalFolder>
       <itemPath>src/HTML.c</itemPath>
+      <itemPath>src/MARKDOWN.c</itemPath>
+      <itemPath>src/XML.c</itemPath>
       <itemPath>src/annotation.c</itemPath>
       <itemPath>src/attribute.c</itemPath>
       <itemPath>src/css_parse.c</itemPath>
@@ -88,6 +94,7 @@
       <itemPath>src/matrix_queue.c</itemPath>
       <itemPath>src/memwatch.c</itemPath>
       <itemPath>src/node.c</itemPath>
+      <itemPath>src/output.c</itemPath>
       <itemPath>src/queue.c</itemPath>
       <itemPath>src/range.c</itemPath>
       <itemPath>src/range_array.c</itemPath>
@@ -114,8 +121,9 @@
   <confs>
     <conf name="Debug" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -150,13 +158,17 @@
       </compileType>
       <item path="include/AESE/AESE.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/HTML.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/MARKDOWN.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/STIL/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/cJSON.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/memory.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/aeseserver_AeseFormatter.h" ex="false" tool="3" flavor2="0">
+      <item path="include/XML.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/amigaconfig.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -167,6 +179,8 @@
       <item path="include/asciitab.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/calliope_AeseFormatter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/css_parse.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -214,6 +228,8 @@
       </item>
       <item path="include/node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/output.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/plain_text.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/queue.h" ex="false" tool="3" flavor2="0">
@@ -240,11 +256,15 @@
       </item>
       <item path="src/HTML.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/MARKDOWN.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/STIL/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/cJSON.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/memory.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/XML.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/annotation.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -283,6 +303,8 @@
       <item path="src/memwatch.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/node.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/output.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/queue.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -305,8 +327,9 @@
     </conf>
     <conf name="Release" type="1">
       <toolsSet>
-        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
         <compilerSet>GNU|GNU</compilerSet>
+        <dependencyChecking>true</dependencyChecking>
+        <rebuildPropChanged>false</rebuildPropChanged>
       </toolsSet>
       <compileType>
         <cTool>
@@ -324,13 +347,17 @@
       </compileType>
       <item path="include/AESE/AESE.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/HTML.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/MARKDOWN.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/STIL/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/cJSON.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/memory.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/aeseserver_AeseFormatter.h" ex="false" tool="3" flavor2="0">
+      <item path="include/XML.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/amigaconfig.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -341,6 +368,8 @@
       <item path="include/asciitab.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/calliope_AeseFormatter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/css_parse.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -388,6 +417,8 @@
       </item>
       <item path="include/node.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/output.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/plain_text.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/queue.h" ex="false" tool="3" flavor2="0">
@@ -414,11 +445,15 @@
       </item>
       <item path="src/HTML.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/MARKDOWN.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/STIL/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/cJSON.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/memory.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/XML.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/annotation.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -457,6 +492,8 @@
       <item path="src/memwatch.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/node.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/output.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/queue.c" ex="false" tool="0" flavor2="0">
       </item>

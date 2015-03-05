@@ -21,7 +21,7 @@
 #define	NODE_H
 
 typedef struct node_struct node;
-node *node_create( char *name, char *html_name, int offset, int len, 
+node *node_create( char *name, char *output_name, int offset, int len, 
      int empty, int rightmost );
 void node_dispose( node *n );
 void node_add_child( node *n, node *c );
@@ -42,7 +42,7 @@ node *node_next_sibling( node *n );
 node *node_prec_sibling( node *n );
 node *node_split_off_left( node *n, int rhs_start );
 char *node_name( node *n );
-char *node_html_name( node *n );
+char *node_output_name( node *n );
 int node_precedes( node *n, node *m );
 int node_follows( node *n, node *r );
 int node_overlaps_on_left( node *r, node *n );

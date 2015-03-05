@@ -1,11 +1,11 @@
 {"format":"CSS","title":"tei-lite","body":"body {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 14px}
-span.weak { display: none }
-span.strong { display: inline }
-span.italics { font-style: italic } 
-span.emph { font-style: italic } 
+span.weak { display: none; -xml-tag: pc; -xml-attr-force: weak }
+span.strong { display: inline; -xml-tag: pc; -xml-attr-force: strong }
+span.italics { font-style: italic; -xml-tag: hi; -xml-attr-rend: italics; -md-tag: * } 
+em.emph { font-style: italic; -md-tag: _ } 
 span.foreign { font-style: italic } 
-span.bold { font-weight: bold; } 
-span.smallcaps { font-variant: small-caps; } 
+span.bold { font-weight: bold; -md-tag: **; -xml-tag: hi; -xml-attr-rend: bold } 
+span.smallcaps { font-variant: small-caps; -xml-tag: hi;-xml-attr-rend: smallcaps } 
 span.gloss { font-style: normal }
 span.speaker { font-size: 12px; font-weight: bold } 
 span.label { font-style: normal }
@@ -16,18 +16,13 @@ span.name { font-style: normal }
 span.soCalled { font-style: normal }
 span.title { font-size: 18px }
 span.unclear { color: darkgrey }
-span.rs { font-style: normal }
+span.rs { font-style: normal; -opt-type: type; }
 span.date { font-style: normal }
 span.time { font-style: normal }
-span.num { font-style: normal }
+span.num { font-style: normal; }
 span.biblScope { font-style: normal }
-span.editor { font-style: normal }
-span.publisher{ font-style: normal }
-span.pubPlace { font-style: normal }
-span.w { font-style: normal }
-span.pc { font-style: normal }
 span.eg { font-style: normal }
-span.code { font-family: Courier, monospace }
+code.code { font-family: Courier, monospace }
 span.ident { font-family: Courier, monospace }
 span.gi { font-family: Courier, monospace }
 span.att { font-family: Courier, monospace }

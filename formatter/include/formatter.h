@@ -35,14 +35,14 @@ typedef struct
         load_markup_func lm;
 } format;
 typedef struct formatter_struct formatter;
-formatter *formatter_create( int len );
+formatter *formatter_create( int len, output_fmt_type output_format );
 void formatter_dispose( formatter *f );
 int formatter_css_parse( formatter *f, const char *data, int len );
 int formatter_load_markup( formatter *f, load_markup_func mfunc, 
     const char *data, int len );
-int formatter_make_html( formatter *f, const char *text, int len );
-int formatter_save_html( formatter *f, char *file );
-char *formatter_get_html( formatter *f, int *len );
+int formatter_make_output( formatter *f, const char *text, int len );
+int formatter_save_output( formatter *f, char *file );
+char *formatter_get_output( formatter *f, int *len );
 int formatter_cull_ranges( formatter *f, char *text, int *len );
 #ifdef	__cplusplus
 }

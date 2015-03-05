@@ -53,11 +53,11 @@ void jni_report( const char *fmt, ... )
  */
 JNIEXPORT jint JNICALL Java_calliope_AeseFormatter_format
   (JNIEnv *env, jobject obj, jbyteArray text, jobjectArray markup, 
-    jobjectArray css, jobjectArray formats, jobject jsonHtml)
+    jobjectArray css, jobjectArray formats, jobject response)
 {
     int res=0;
     jsize i,len,flen;
-    char *html;
+    char *output;
     jboolean isCopy=0;
     //jni_report("entered format\n");
     jbyte *t_data = (*env)->GetByteArrayElements(env, text, &isCopy);
@@ -115,10 +115,10 @@ JNIEXPORT jint JNICALL Java_calliope_AeseFormatter_format
                 if ( res )
                 {
                     //jni_report( "about to call master_convert\n" );
-                    html = master_convert( hf );
+                    output = master_convert( hf );
                     //jni_report( "finished calling master_convert\n" );
-                    if ( html != NULL )
-                        res = set_string_field( env, jsonHtml, "body", html );
+                    if ( output != NULL )
+                        res = set_string_field( env, response, "body", output );
                 }
             }
             master_dispose( hf );

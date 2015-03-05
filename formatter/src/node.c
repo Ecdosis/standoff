@@ -24,12 +24,14 @@
 #include "range.h"
 #include "node.h"
 #include "error.h"
-#include "HTML.h"
+#include "master.h"
+#include "text_buf.h"
+#include "output.h"
 #include "memwatch.h"
 struct node_struct
 {
 	char *name;
-    char *html_name;
+    char *output_name;
 	int offset;
 	int len;
     int empty;
@@ -49,7 +51,7 @@ struct node_struct
  * @param empty 1 if the html element is empty
  * @return the newly formed node
  */
-node *node_create( char *name, char *html_name, int offset, int len, 
+node *node_create( char *name, char *output_name, int offset, int len, 
     int empty, int rightmost )
 {
     node *n = calloc( 1, sizeof(node) );
@@ -59,7 +61,7 @@ node *node_create( char *name, char *html_name, int offset, int len,
         //if ( (unsigned long) n == u )
         //    printf("0x10019ecf0\n");
         n->name = strdup( name );
-        n->html_name = (html_name==NULL)?NULL:strdup( html_name );
+        n->output_name = (output_name==NULL)?NULL:strdup( output_name );
         n->offset = offset;
         n->len = len;
         n->empty = empty;
@@ -86,10 +88,10 @@ void node_dispose( node *n )
         free( n->name );
         n->name = NULL;
     }
-    if ( n->html_name != NULL )
+    if ( n->output_name != NULL )
     {
-        free( n->html_name );
-        n->html_name = NULL;
+        free( n->output_name );
+        n->output_name = NULL;
     }
     if ( n->attrs != NULL )
         attribute_dispose( n->attrs );
@@ -344,8 +346,8 @@ int node_end( node *n )
  */
 void node_split( node *n, int pos )
 {
-    node *next = node_create( n->name, n->html_name, pos, node_end(n)-pos,
-        html_is_empty(n->html_name), n->rightmost );
+    node *next = node_create( n->name, n->output_name, pos, node_end(n)-pos,
+        html_is_empty(n->output_name), n->rightmost );
     attribute *attr = n->attrs;
     while ( attr != NULL )
     {
@@ -460,13 +462,13 @@ char *node_name( node *n )
     return n->name;
 }
 /**
- * Get a node's html tag name
+ * Get a node's output tag name
  * @param n the node in question
  * @return the name of the node
  */
-char *node_html_name( node *n )
+char *node_output_name( node *n )
 {
-    return n->html_name;
+    return n->output_name;
 }
 /**
  * Does the new node precede the in-tree node?
@@ -519,7 +521,7 @@ int node_overlaps_on_right( node *n, node *r )
  */
 range *node_to_range( node *n )
 {
-    range *r = range_create( node_name(n), node_html_name(n), node_offset(n), 
+    range *r = range_create( node_name(n), node_output_name(n), node_offset(n), 
         node_len(n) ); 
     range_set_rightmost( r, n->rightmost );
     attribute *attr = n->attrs;

@@ -191,7 +191,6 @@ static int is_whitespace( const char *s, int len )
  * @param text the UTF-8 string
  * @param len its length in BYTES
  * @return its length in CHARS
- */
 static int utf8_len( XML_Char *text, int len )
 {
      int i;
@@ -205,6 +204,7 @@ static int utf8_len( XML_Char *text, int len )
      }
      return nchars;
 }
+ */
 /**
  * trim leading and trailing white space down to 1 char
  * @param u the userdata struct

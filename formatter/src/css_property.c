@@ -25,20 +25,29 @@
 
 #define AESE_PREFIX "-aese-"
 #define AESE_PREFIX_LEN 6
+#define MD_ATTR "-md-attr-"
+#define MD_ATTR_LEN 9
+#define XML_ATTR "-xml-attr-"
+#define XML_ATTR_LEN 10
+#define MD_TAG "-md-tag-"
+#define MD_TAG_LEN 8
+#define XML_TAG "-xml-tag-"
+#define XML_TAG_LEN 9
 
 /**
  * A css property is a property like font-weight: bold. Except that we
- * extend it by prefixing "-aese-xmlname: htmlname. This is for copying 
- * over attributes from XML to HTML.
+ * extend it by prefixing "-aese-markup_name: output_name. This is for copying 
+ * over attributes from markup properties to the output format.
  */
 struct css_property_struct
 {
-	/* name of the xml-attribute */
-	char *xml_name;
+	/* name of the markup-attribute */
+	char *markup_name;
 	/* if NULL then we only match not replace */
-	char *html_name;
+	char *output_name;
     /* property value to be set */
-    char *html_value;
+    char *output_value;
+    CssPropertyType type;
 };
 
 /**
@@ -47,20 +56,20 @@ struct css_property_struct
  */
 void css_property_dispose( css_property *p )
 {
-    if ( p->xml_name != NULL )
+    if ( p->markup_name != NULL )
     {
-        free( p->xml_name );
-        p->xml_name = NULL;
+        free( p->markup_name );
+        p->markup_name = NULL;
     }
-    if ( p->html_name != NULL )
+    if ( p->output_name != NULL )
     {
-        free( p->html_name );
-        p->html_name = NULL;
+        free( p->output_name );
+        p->output_name = NULL;
     }
-    if ( p->html_value != NULL )
+    if ( p->output_value != NULL )
     {
-        free( p->html_value );
-        p->html_name = NULL;
+        free( p->output_value );
+        p->output_name = NULL;
     }
     free( p );
     p = NULL;
@@ -75,54 +84,58 @@ css_property *css_property_clone( css_property *p )
     css_property *copy = calloc( 1, sizeof(css_property) );
     if ( copy == NULL )
         error( "css_property: failed to duplicate property struct\n");
-    if ( p->xml_name != NULL )
+    else
     {
-        copy->xml_name = strdup(p->xml_name);
-        if ( copy->xml_name == NULL )
-            error("css_property: failed to duplicate xml_name "
-                "field during clone\n");
-    }
-    if ( p->html_name != NULL )
-    {
-        copy->html_name = strdup(p->html_name);
-        if ( copy->html_name == NULL )
-            error("css_property: failed to duplicate xml_name "
-                "field during clone\n");
-    }
-    if ( p->html_value != NULL )
-    {
-        copy->html_value = strdup(p->html_value);
-        if ( copy->html_value == NULL )
-            error("css_property: failed to duplicate html_value "
-                "field during clone\n");
+        if ( p->markup_name != NULL )
+        {
+            copy->markup_name = strdup(p->markup_name);
+            if ( copy->markup_name == NULL )
+                error("css_property: failed to duplicate markup_name "
+                    "field during clone\n");
+        }
+        if ( p->output_name != NULL )
+        {
+            copy->output_name = strdup(p->output_name);
+            if ( copy->output_name == NULL )
+                error("css_property: failed to duplicate markup_name "
+                    "field during clone\n");
+        }
+        if ( p->output_value != NULL )
+        {
+            copy->output_value = strdup(p->output_value);
+            if ( copy->output_value == NULL )
+                error("css_property: failed to duplicate output_value "
+                    "field during clone\n");
+        }
+        copy->type = p->type;
     }
     return copy;
 }
 /**
- * Get the property's html name
+ * Get the property's output name
  * @param p the property in question
- * @return a string being the html attribute name
+ * @return a string being the output attribute name
  */
-char *css_property_get_html_name( css_property *p )
+char *css_property_get_output_name( css_property *p )
 {
-    return p->html_name;
+    return p->output_name;
 }
 /**
- * Get the property's xml name
+ * Get the property's markup name
  * @param p the property in question
- * @return a string being the xml attribute name
+ * @return a string being the markup attribute name
  */
-char *css_property_get_xml_name( css_property *p )
+char *css_property_get_markup_name( css_property *p )
 {
-    return p->xml_name;
+    return p->markup_name;
 }/**
- * Get the html property value
+ * Get the output property value
  * @param p the property in question
  * @return a string being the property value
  */
-char *css_property_get_html_value( css_property *p )
+char *css_property_get_output_value( css_property *p )
 {
-    return p->html_value;
+    return p->output_value;
 }
 /**
  * Remove all instances of the given char from the string in situ
@@ -145,11 +158,85 @@ static void strip_char( char *str, char c )
     }
     str[j] = 0;
 }
+static css_property *parse_custom_property( char *data, int start, int end,
+    CssPropertyType type )
+{
+    // the property name had an escaped ":"
+	int escaped = 0;
+    int i = start;
+    css_property *prop_temp = NULL;
+    while ( i < end )
+    {
+        if ( data[i]=='\\' )
+        {
+            escaped = 1;
+            i+=2;
+        }
+        else if ( data[i] == ':' )
+        {
+            // parse left hand side
+            prop_temp = calloc( 1, sizeof(css_property) );
+            if ( prop_temp != NULL )
+            {
+                int lhs_len = i-start;
+                prop_temp->type = type;
+                prop_temp->markup_name = calloc( 1, lhs_len+1 );
+                if ( prop_temp->markup_name != NULL )
+                {
+                    strncpy( prop_temp->markup_name, &data[start], lhs_len );
+                    if ( escaped )
+                        strip_char(prop_temp->markup_name,'\\');
+                    // parse right hand side
+                    i++;
+                    while ( i<end && isspace(data[i]) )
+                        i++;
+                    while ( end>i && isspace(data[end]) )
+                        end--;
+                    if ( i < end )
+                    {
+                        int rhs_len = (end-i)+1;
+                        prop_temp->output_name = calloc( 1, rhs_len+1 );
+                        if ( prop_temp->output_name != NULL )
+                        {
+                            strncpy( prop_temp->output_name, &data[i], 
+                                rhs_len );
+                            break;
+                        }
+                        else
+                        {
+                            css_property_dispose( prop_temp );
+                            warning("css_property: failed to allocate"
+                                "output name\n");
+                            prop_temp = NULL;
+                        }
+                    }
+                    else
+                    {
+                        warning("css_property: missing output name\n");
+                        css_property_dispose( prop_temp );
+                        prop_temp = NULL;
+                    }
+                }
+                else
+                {
+                    css_property_dispose( prop_temp );
+                    warning( "css_property: failed to allocate markup_name\n");
+                    prop_temp = NULL;
+                }
+            }
+            else
+            {
+                warning("css_property: failed to allocate css_property\n");
+            }
+        }
+        i++;
+    }
+    return prop_temp;
+}
 /**
  * Parse a single property from the raw CSS data. Ignore any property
- * not beginning with "-aese-". Such properties specify
- * the xml attribute name and its corresponding html name. The attribute
- * value is the same in both cases. Such properties are supposed to be
+ * not beginning with "-aese-, -md-, -html-, or -xml-". Such properties specify
+ * extensions for the translation phase. Such properties are supposed to be
  * ignored by browser-based css parsers
  * @param data the raw CSS data read from the file
  * @param len the length of the property in data
@@ -157,97 +244,40 @@ static void strip_char( char *str, char c )
  */
 css_property *css_property_parse( const char *data, int len )
 {
-    // format: -aese-xml_name: html_name;
-    // copy the attribute value over from the xml unchanged (not here)
-	int i,start=0, end=len;
+    // format: 
+    // -aese-markup_name: output_name;
+    // [copy the attribute value over from the markup unchanged (not here)]
+	// -md-attr-name: value
+    // -xml-attr-name: value
+    // -xml-tag: name
+    // -md-tag: name
+    int start=0, end=len;
     css_property *prop_temp = NULL;
-    // the property name had an escaped ":"
-	int escaped = 0;
     while ( start<end && isspace(data[start]) )
     {
 		start++;
         end--;
     }
 	if ( strncmp(&data[start],AESE_PREFIX,AESE_PREFIX_LEN)==0 )
-    {
-        start += AESE_PREFIX_LEN;
-        i = start;
-        while ( i < end )
-        {
-            if ( data[i]=='\\' )
-            {
-                escaped = 1;
-                i+=2;
-            }
-            else if ( data[i] == ':' )
-            {
-                // parse left hand side
-                prop_temp = calloc( 1, sizeof(css_property) );
-                if ( prop_temp != NULL )
-                {
-                    int lhs_len = i-start;
-                    prop_temp->xml_name = calloc( 1, lhs_len+1 );
-                    if ( prop_temp->xml_name != NULL )
-                    {
-                        strncpy( prop_temp->xml_name, &data[start], lhs_len );
-                        if ( escaped )
-                            strip_char(prop_temp->xml_name,'\\');
-                        // parse right hand side
-                        i++;
-                        while ( i<end && isspace(data[i]) )
-                            i++;
-                        while ( end>i && isspace(data[end]) )
-                            end--;
-                        if ( i < end )
-                        {
-                            int rhs_len = (end-i)+1;
-                            prop_temp->html_name = calloc( 1, rhs_len+1 );
-                            if ( prop_temp->html_name != NULL )
-                            {
-                                strncpy( prop_temp->html_name, &data[i], 
-                                    rhs_len );
-                                break;
-                            }
-                            else
-                            {
-                                css_property_dispose( prop_temp );
-                                warning("css_property: failed to allocate"
-                                    "html name\n");
-                                prop_temp = NULL;
-                            }
-                        }
-                        else
-                        {
-                            warning("css_property: missing html name\n");
-                            css_property_dispose( prop_temp );
-                            prop_temp = NULL;
-                        }
-                    }
-                    else
-                    {
-                        css_property_dispose( prop_temp );
-                        warning( "css_property: failed to allocate xml_name\n");
-                        prop_temp = NULL;
-                    }
-                }
-                else
-                {
-                    warning("css_property: failed to allocate css_property\n");
-                }
-            }
-            i++;
-        }
-    }
-	return prop_temp;
+        return parse_custom_property( data, start+AESE_PREFIX_LEN, end, Aese );
+    else if ( strncmp(&data[start],MD_ATTR,MD_ATTR_LEN)==0 )
+        return parse_custom_property( data, start+MD_ATTR_LEN, end, MdAttr );
+	else if ( strncmp(&data[start],XML_ATTR,XML_ATTR_LEN)==0 )
+        return parse_custom_property( data, start+XML_ATTR_LEN, end, XmlAttr );
+    else if ( strncmp(&data[start],XML_TAG,XML_TAG_LEN)==0 )
+        return parse_custom_property( data, start+XML_TAG_LEN, end, XmlTag );
+    else if ( strncmp(&data[start],MD_TAG,MD_TAG_LEN)==0 )
+        return parse_custom_property( data, start+MD_TAG_LEN, end, MdTag );
+    return prop_temp;
 }
 /**
- * Set the html value of this property
+ * Set the output value of this property
  * @param p the property in question
- * @param value the value for the HTML attribute
+ * @param value the value for the output attribute
  */
-void css_property_set_html_value( css_property *p, char *value )
+void css_property_set_output_value( css_property *p, char *value )
 {
-    p->html_value = strdup( value );
-    if ( p->html_value == NULL )
-        warning( "css_property: failed to duplicate html value\n" );
+    p->output_value = strdup( value );
+    if ( p->output_value == NULL )
+        warning( "css_property: failed to duplicate output value\n" );
 }

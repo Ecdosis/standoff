@@ -22,7 +22,7 @@
 
 typedef struct dom_struct dom;
 dom *dom_create( const char *text, int len, range_array *ranges,  
-    hashmap *rules, hashset *properties );
+    hashmap *rules, hashset *properties, output_fmt_type output_format );
 void dom_dispose( dom *d );
 int dom_build( dom *d );
 void dom_print( dom *d );

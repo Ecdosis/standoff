@@ -84,108 +84,108 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/stripper: ${OBJECTFILES}
 
 ${OBJECTDIR}/_ext/1858218211/cJSON.o: ../formatter/src/STIL/cJSON.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1858218211
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1858218211/cJSON.o ../formatter/src/STIL/cJSON.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1858218211/cJSON.o ../formatter/src/STIL/cJSON.c
 
 ${OBJECTDIR}/_ext/1078767344/memwatch.o: ../formatter/src/memwatch.c 
 	${MKDIR} -p ${OBJECTDIR}/_ext/1078767344
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/_ext/1078767344/memwatch.o ../formatter/src/memwatch.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1078767344/memwatch.o ../formatter/src/memwatch.c
 
 ${OBJECTDIR}/src/AESE.o: src/AESE.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/AESE.o src/AESE.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/AESE.o src/AESE.c
 
 ${OBJECTDIR}/src/STIL.o: src/STIL.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/STIL.o src/STIL.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL.o src/STIL.c
 
 ${OBJECTDIR}/src/attribute.o: src/attribute.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/attribute.o src/attribute.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/attribute.o src/attribute.c
 
 ${OBJECTDIR}/src/dest_file.o: src/dest_file.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/dest_file.o src/dest_file.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/dest_file.o src/dest_file.c
 
 ${OBJECTDIR}/src/error.o: src/error.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/error.o src/error.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/error.o src/error.c
 
 ${OBJECTDIR}/src/hashmap.o: src/hashmap.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/hashmap.o src/hashmap.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashmap.o src/hashmap.c
 
 ${OBJECTDIR}/src/hashset.o: src/hashset.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/hashset.o src/hashset.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashset.o src/hashset.c
 
 ${OBJECTDIR}/src/hh_exceptions.o: src/hh_exceptions.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/hh_exceptions.o src/hh_exceptions.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hh_exceptions.o src/hh_exceptions.c
 
 ${OBJECTDIR}/src/layer.o: src/layer.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/layer.o src/layer.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/layer.o src/layer.c
 
 ${OBJECTDIR}/src/log.o: src/log.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/log.o src/log.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/log.o src/log.c
 
 ${OBJECTDIR}/src/milestone.o: src/milestone.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/milestone.o src/milestone.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/milestone.o src/milestone.c
 
 ${OBJECTDIR}/src/ramfile.o: src/ramfile.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/ramfile.o src/ramfile.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/ramfile.o src/ramfile.c
 
 ${OBJECTDIR}/src/range.o: src/range.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/range.o src/range.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/range.o src/range.c
 
 ${OBJECTDIR}/src/recipe.o: src/recipe.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/recipe.o src/recipe.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/recipe.o src/recipe.c
 
 ${OBJECTDIR}/src/simplification.o: src/simplification.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/simplification.o src/simplification.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/simplification.o src/simplification.c
 
 ${OBJECTDIR}/src/stack.o: src/stack.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/stack.o src/stack.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stack.o src/stack.c
 
 ${OBJECTDIR}/src/stripper.o: src/stripper.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/stripper.o src/stripper.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/stripper.o src/stripper.c
 
 ${OBJECTDIR}/src/userdata.o: src/userdata.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/userdata.o src/userdata.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/userdata.o src/userdata.c
 
 ${OBJECTDIR}/src/utils.o: src/utils.c 
 	${MKDIR} -p ${OBJECTDIR}/src
-	${RM} $@.d
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF $@.d -o ${OBJECTDIR}/src/utils.o src/utils.c
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include/STIL -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utils.o src/utils.c
 
 # Subprojects
 .build-subprojects:

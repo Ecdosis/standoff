@@ -244,16 +244,18 @@ static int set_string_field( JNIEnv *env, jobject obj,
     }
     return res;
 }
-static int add_layer( JNIEnv *env, jobject obj, char *value )
+static int add_layer( JNIEnv *env, jobject obj, char *value, char *name )
 {
     int res = 0;
     jstring jstr;
+    jstring jname;
     jstr = (*env)->NewStringUTF( env, value );
-    if (jstr != NULL) 
+    jname = (*env)->NewStringUTF( env, name );
+    if (jstr != NULL && jname!= NULL ) 
     {
         jclass cls = (*env)->GetObjectClass( env, obj );
         jmethodID mid = (*env)->GetMethodID( env, cls,"addLayer",
-            "(Ljava/lang/String;)V");
+            "(Ljava/lang/String;Ljava/lang/String;)V");
         if ( mid == 0 )
         {
             tmplog("stripper: failed to find method addLayer\n");
@@ -262,7 +264,7 @@ static int add_layer( JNIEnv *env, jobject obj, char *value )
         else
         {
             (*env)->ExceptionClear( env );
-            (*env)->CallVoidMethod( env, obj, mid, jstr);
+            (*env)->CallVoidMethod( env, obj, mid, jstr, jname);
             if((*env)->ExceptionOccurred(env)) 
             {
                 fprintf(stderr,"stripper: couldn't add layer\n");
@@ -273,6 +275,10 @@ static int add_layer( JNIEnv *env, jobject obj, char *value )
                 res = 1;
         }
     }
+    if ( jstr != NULL )
+        (*env)->DeleteLocalRef(env,jstr);
+    if ( jname != NULL )
+        (*env)->DeleteLocalRef(env,jname);
     return res;
 }
 /**
@@ -306,7 +312,8 @@ void userdata_write_files( JNIEnv *env, userdata *u, jobject text,
             }
             else
             {
-                res = add_layer( env, markup, ramfile_get_buf(df) );
+                res = add_layer( env, markup, ramfile_get_buf(df),
+                    ramfile_get_name(df) );
             }
         }
         dest_file_dispose( u->markup_dest[i++] );

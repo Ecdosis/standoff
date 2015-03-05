@@ -36,6 +36,7 @@
 #include "css_rule.h"
 #include "range_array.h"
 #include "hashset.h"
+#include "master.h"
 #include "formatter.h"
 #include "cJSON.h"
 #include "STIL/STIL.h"

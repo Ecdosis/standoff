@@ -25,14 +25,20 @@
 #include "range.h"
 #include "hashset.h"
 #include "range_array.h"
+#include "master.h"
 #include "formatter.h"
 #include "css_selector.h"
 #include "css_property.h"
 #include "css_rule.h"
 #include "css_parse.h"
+#include "hashmap.h"
+#include "attribute.h"
+#include "annotation.h"
+#include "node.h"
+#include "text_buf.h"
+#include "output.h"
 #include "matrix.h"
 #include "queue.h"
-#include "text_buf.h"
 #include "dom.h"
 #include "error.h"
 #include "memwatch.h"
@@ -45,17 +51,19 @@ struct formatter_struct
     range_array *ranges;
     hashmap *css_rules;
     hashset *properties;
+    output_fmt_type output_format;
     dom *tree;
 };
 /**
  * Create a formatter
  * @return a formatter object
  */
-formatter *formatter_create( int len )
+formatter *formatter_create( int len, output_fmt_type output_format )
 {
     formatter *f = calloc( 1, sizeof(formatter) );
     if ( f != NULL )
     {
+        f->output_format = output_format;
         f->ranges = range_array_create();
         if ( f->ranges == NULL )
         {
@@ -151,16 +159,17 @@ int formatter_load_markup( formatter *f, load_markup_func mfunc,
     return res;
 }
 /**
- * Make HTML using the already loaded markup and css data
+ * Make output using the already loaded markup and css data
  * @param f the formatter in question
  * @param text the text for format
  * @param len its length
  * @return 1 if it worked, else 0
  */
-int formatter_make_html( formatter *f, const char *text, int len )
+int formatter_make_output( formatter *f, const char *text, int len )
 {
     int res = 0;
-    f->tree = dom_create( text, len, f->ranges, f->css_rules, f->properties );
+    f->tree = dom_create( text, len, f->ranges, f->css_rules, f->properties,
+        f->output_format );
     if ( f->tree != NULL )
     {
         res = dom_build( f->tree );
@@ -168,12 +177,12 @@ int formatter_make_html( formatter *f, const char *text, int len )
     return res;
 }
 /**
- * Save the formatted HTML to disk
- * @param f the formatter containing the formatted HTML
+ * Save the formatted output to disk
+ * @param f the formatter containing the formatted output
  * @param file the file to save it to
  * @return 1 if it succeeded, else 0
  */
-int formatter_save_html( formatter *f, char *file )
+int formatter_save_output( formatter *f, char *file )
 {
     int t_len,res = 0;
     text_buf *tb;
@@ -185,12 +194,12 @@ int formatter_save_html( formatter *f, char *file )
     return res == t_len;
 }
 /**
- * Get the HTML data as a string
+ * Get the output data as a string
  * @param f the formatter in question
- * @param VAR param for HTML length
+ * @param VAR param for output length
  * @return the HTML or NULL
  */
-char *formatter_get_html( formatter *f, int *len )
+char *formatter_get_output( formatter *f, int *len )
 {
     dom_print( f->tree );
     text_buf *tb = dom_get_text_buf( f->tree );

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "text_buf.h"
 #include "error.h"
 #include "memwatch.h"
@@ -102,6 +103,28 @@ int text_buf_concat( text_buf *tb, char *text, int len )
     tb->len += len;
     tb->buf[tb->len] = 0;
     return 1;
+}
+/**
+ * Concatenate a formatted string onto the buffer for printing
+ * @param tb the text_buf in question
+ * @param format the format of the data
+ * @param len the number of bytes to copy
+ */
+void text_buf_print( text_buf *tb, const char *format, int len, ... )
+{
+    char *temp = malloc( len+1 );
+    if ( temp != NULL )
+    {
+        va_list args;
+        va_start( args, len );
+        int res = vsnprintf( temp, len+1, format, args );
+        if ( res == len )
+            text_buf_concat( tb, temp, len );
+        else
+            warning("text_buf: failed to print %d bytes to output\n",len);
+        free( temp );
+        va_end( args );
+    }
 }
 /**
  * Get this text buf's buffer

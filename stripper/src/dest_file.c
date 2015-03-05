@@ -361,7 +361,7 @@ int dest_file_write( dest_file *df, char *data, int len )
 int dest_file_open( dest_file *df )
 {
 #ifdef JNI
-    df->dst = ramfile_create();
+    df->dst = ramfile_create(df->midname);
     return ( df->dst != NULL );
 #else
     int res = 0;

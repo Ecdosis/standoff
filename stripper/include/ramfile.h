@@ -12,12 +12,13 @@
 extern "C" {
 #endif
 typedef struct ramfile_struct ramfile;
-ramfile *ramfile_create();
+ramfile *ramfile_create( const char *name);
 void ramfile_dispose( ramfile *rf );
 int ramfile_write( ramfile *rf, const char *data, int len );
 int ramfile_print( ramfile *rf, const char *fmt, ... );
 char *ramfile_get_buf( ramfile *rf );
 int ramfile_get_len( ramfile *rf );
+char *ramfile_get_name( ramfile *rf );
 
 #ifdef	__cplusplus
 }

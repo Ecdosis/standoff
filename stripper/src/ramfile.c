@@ -12,13 +12,15 @@ struct ramfile_struct
 {
     int allocated;
     char *buf;
+    char *name;
     int used;
 };
 /**
  * Create a ramfile - a file-like holder of a string buffer in memory
+ * @param name the name of the buffer
  * @return an initialised ramfile object
  */
-ramfile *ramfile_create()
+ramfile *ramfile_create( const char *name )
 {
     ramfile *rf = calloc( 1, sizeof(ramfile) );
     if ( rf != NULL )
@@ -31,8 +33,12 @@ ramfile *ramfile_create()
         }
         else
         {
+            char *hyphen_pos = strrchr(name,'-');
             rf->allocated = BLOCK_SIZE;
             rf->used = 0;
+            if ( hyphen_pos != NULL && strlen(hyphen_pos+1) > 0 )
+                name = hyphen_pos+1;
+            rf->name = strdup(name);
         }
     }
 	return rf;
@@ -44,6 +50,8 @@ void ramfile_dispose( ramfile *rf )
 {
     if ( rf->buf != NULL )
         free( rf->buf );
+    if ( rf->name != NULL )
+        free( rf->name );
     free( rf );
 }
 /**
@@ -113,4 +121,8 @@ char *ramfile_get_buf( ramfile *rf )
 int ramfile_get_len( ramfile *rf )
 {
     return rf->used;
+}
+char *ramfile_get_name( ramfile *rf )
+{
+    return rf->name;
 }

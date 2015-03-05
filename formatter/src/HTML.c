@@ -23,6 +23,15 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <limits.h>
+#include "master.h"
+#include "text_buf.h"
+#include "attribute.h"
+#include "hashmap.h"
+#include "annotation.h"
+#include "range.h"
+#include "node.h"
+#include "output.h"
+#include "node.h"
 #include "HTML.h"
 #include "error.h"
 #include "memwatch.h"
@@ -91,7 +100,8 @@ static unsigned int matrix[107][4] = {
 /*em*/PHRASING,
 /*embed*/VOID,
 /*fieldset*/{0xdf66eeff,0xb9ff77fd,0x9adfcecf,0x788},
-/*figcaption*/FLOW,
+/*figc// rules are read-only from formatter
+    aption*/FLOW,
 /*figure*/{0xdf66eeff,0xb8ff77ff,0x9adfcecf,0x788},
 /*footer*/FLOW,
 /*form*/FLOW,
@@ -247,4 +257,48 @@ int html_is_empty( char *tag )
 	int word = bit / 32;
 	int res = empty[word] & (flag<<(31-(bit%32)));
 	return res > 0;
+}
+/**
+ * Print a single node and its children, siblings
+ * @param o the output object to write to
+ * @param n the node to print
+ */
+void html_print_node( output *o, node *n )
+{
+	node *c;
+    int start,end;
+    char *output_name = node_output_name(n);
+    char *class_name = node_name(n);
+    char attrs[128];
+    node_get_attributes( n, attrs, 128 );
+    if ( !node_empty(n) )
+    {
+        if ( !node_is_root(n) )
+            text_buf_print( output_text_buf(o), "<%s%s class=\"%s\">", 
+                strlen(output_name)+strlen(class_name)+strlen(attrs)+11, 
+                output_name, attrs, class_name );
+    }
+    c = node_first_child(n);
+    start = node_offset(n);
+    end = node_end(n);
+    while ( c != NULL )
+    {
+        int pos = node_offset( c );
+        if ( pos > start )
+            output_print_text( o, start, pos-start );
+        html_print_node( o, c );
+        start = node_end( c );
+        c = node_next_sibling( c );
+    }
+    if ( end > start )
+        output_print_text( o, start, end-start );
+    if ( !node_is_root(n) )
+    {
+        if ( !node_empty(n) )
+            text_buf_print(output_text_buf(o), "</%s>",strlen(output_name)+3, 
+                output_name);
+        else if ( node_rightmost(n) )
+            text_buf_print(output_text_buf(o),"<%s>",strlen(output_name)+2,
+                output_name);
+    }
 }

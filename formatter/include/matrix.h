@@ -25,7 +25,7 @@ matrix *matrix_create();
 void matrix_dispose( matrix *m );
 int matrix_inside( matrix *m, char *name1, char *name2 );
 void matrix_init( matrix *m, range_array *ranges );
-void matrix_update_html( matrix *m );
+void matrix_update_nesting( matrix *m, output *out );
 hashset *matrix_get_lookup( matrix *m );
 void matrix_dump( matrix *m );
 void matrix_record( matrix *m, char *prop1, char *prop2 );

@@ -33,6 +33,7 @@
 #include "hashset.h"
 #include "range.h"
 #include "range_array.h"
+#include "master.h"
 #include "formatter.h"
 #include "css_parse.h"
 #include "error.h"

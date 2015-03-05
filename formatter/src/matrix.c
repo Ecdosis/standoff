@@ -24,9 +24,13 @@
 #include "range.h"
 #include "range_array.h"
 #include "hashset.h"
+#include "master.h"
+#include "node.h"
+#include "text_buf.h"
+#include "output.h"
 #include "matrix.h"
 #include "matrix_queue.h"
-#include "HTML.h"
+#include "output.h"
 #include "error.h"
 #include "memwatch.h"
 
@@ -37,13 +41,13 @@ struct matrix_struct
     int inited;
     hashset *lookup;
     int *cells;
-    char **html_tags;
+    char **output_tags;
     char **names;
 };
 /**
  * 
- * @param n_props number of properties (html_tags+property-names)
- * @param properties array of props and html tag names alternately
+ * @param n_props number of properties (output_tags+property-names)
+ * @param properties array of props and output tag names alternately
  * @return an initialised matrix
  */
 matrix *matrix_create( int n_props, char **properties )
@@ -53,15 +57,15 @@ matrix *matrix_create( int n_props, char **properties )
     {
         m->n_props = n_props/2;
         m->names = calloc( m->n_props, sizeof(char*) );
-        m->html_tags = calloc( m->n_props, sizeof(char*) );
-        if ( m->names != NULL && m->html_tags != NULL )
+        m->output_tags = calloc( m->n_props, sizeof(char*) );
+        if ( m->names != NULL && m->output_tags != NULL )
         {
             int i,j;
             for ( j=0,i=0;i<n_props-1;j++,i+=2 )
             {
                 m->names[j] = strdup(properties[i]);
                 //printf("%s\n",properties[i]);
-                m->html_tags[j] = (properties[i+1]==NULL)
+                m->output_tags[j] = (properties[i+1]==NULL)
                     ?NULL:strdup(properties[i+1]);
             }
             m->cells = (int*)calloc( m->n_props*m->n_props, sizeof(int) );
@@ -124,17 +128,17 @@ void matrix_dispose( matrix *m )
         free( m->names );
         m->names = NULL;
     }
-    if ( m->html_tags != NULL )
+    if ( m->output_tags != NULL )
     {
         int i;
         for ( i=0;i<m->n_props;i++ )
-            if ( m->html_tags[i] != NULL )
+            if ( m->output_tags[i] != NULL )
             {
-                free( m->html_tags[i] );
-                m->html_tags[i] = NULL;
+                free( m->output_tags[i] );
+                m->output_tags[i] = NULL;
             }
-        free( m->html_tags );
-        m->html_tags = NULL;
+        free( m->output_tags );
+        m->output_tags = NULL;
     }
     free( m );
 }
@@ -234,18 +238,19 @@ void matrix_init( matrix *m, range_array *ranges )
     m->inited = 1;
 }
 /**
- * Revise the matrix, setting to 0 any cells representing HTML tags that 
+ * Revise the matrix, setting to 0 any cells representing output tags that 
  * may not nest
  * @param m the matrix to update
+ * @param out the output format 
  */
-void matrix_update_html( matrix *m )
+void matrix_update_nesting( matrix *m, output *out )
 {
     int i,j;
     for ( i=0;i<m->n_props;i++ )
     {
         for ( j=0;j<m->n_props;j++ )
         {
-            int res = html_is_inside(m->html_tags[i], m->html_tags[j]);
+            int res = output_is_inside(out,m->output_tags[i], m->output_tags[j]);
             switch ( res )
             {
                 case 0: // either

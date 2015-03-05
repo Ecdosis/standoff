@@ -24,6 +24,8 @@ extern "C" {
 #endif
 int html_is_inside( char *tag1, char *tag2 );
 int html_is_empty( char *tag );
+void html_print_node( output *o, node *n );
+
 #ifdef	__cplusplus
 }
 #endif

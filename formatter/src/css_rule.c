@@ -178,7 +178,7 @@ css_property *css_rule_get_property( css_rule *r, char *xml_name )
     int i=0;
     for ( i=0;i<r->num_properties;i++ )
     {
-        if ( strcmp(xml_name,css_property_get_xml_name(r->properties[i]))==0 )
+        if ( strcmp(xml_name,css_property_get_markup_name(r->properties[i]))==0 )
             return r->properties[i];
     }
     return NULL;
@@ -204,7 +204,7 @@ int css_rule_match( css_rule *rule, char *name )
 	return 0;
 }
 /**
- * Get the rule's html name
+ * Get the rule's output name
  * @param rule the rule in question
  * @return a string
  */
@@ -213,7 +213,7 @@ char *css_rule_get_element( css_rule *rule )
 	return css_selector_get_element(rule->selectors[rule->index]);
 }
 /**
- * Get the rule's xml name or html class name
+ * Get the rule's markup name or output class name
  * @param rule the rule in question
  * @return a string
  */
@@ -251,8 +251,8 @@ int css_rule_get_num_properties( css_rule *r )
  */
 static void css_rule_print_property( css_property *p )
 {
-	fprintf( stderr, "    -aese-%s: %s;\n", css_property_get_xml_name(p),
-        css_property_get_html_name(p) );
+	fprintf( stderr, "    -aese-%s: %s;\n", css_property_get_markup_name(p),
+        css_property_get_output_name(p) );
 }
 /**
  * Print a single selector. Since there may be several
