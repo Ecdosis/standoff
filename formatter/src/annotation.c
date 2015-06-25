@@ -213,7 +213,8 @@ attribute *annotation_to_attribute( annotation *a, char *xml_name, hashmap *css_
         if ( prop != NULL )
         {
             char *html_name = css_property_get_html_name( prop );
-            //warning("annotation: creating attribute %s:%s\n",html_name,a->value);            return attribute_create( html_name, annotation_get_name(a), a->value );
+            //warning("annotation: creating attribute %s:%s\n",html_name,a->value);            
+            return attribute_create( html_name, annotation_get_name(a), a->value );
         }
         // ignore this
         //else

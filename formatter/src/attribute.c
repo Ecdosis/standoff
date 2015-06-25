@@ -26,8 +26,7 @@
 #include "utils.h"
 #include "memwatch.h"
 
-static char U_ID[] = {'i','d'};
-static char U_A[] = {'a'};
+
 struct attribute_struct
 {
     char *name;
@@ -197,7 +196,7 @@ attribute *attribute_clone( attribute *attr )
             i--;
         int res = 1;
         if ( i == vlen-1 )
-            res = attribute_append_value( attr, U_A );
+            res = attribute_append_value( attr, "a" );
         if ( res )
         {
             char *value = attribute_inc_value( attr );

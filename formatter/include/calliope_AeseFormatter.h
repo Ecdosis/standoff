@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     calliope_AeseFormatter
  * Method:    format
- * Signature: ([C[Ljava/lang/String;[Ljava/lang/String;Lcalliope/json/JSONResponse;)I
+ * Signature: (Ljava/lang/String;[Ljava/lang/String;[Ljava/lang/String;Lcalliope/json/JSONResponse;)I
  */
 JNIEXPORT jint JNICALL Java_calliope_AeseFormatter_format
-  (JNIEnv *, jobject, jcharArray, jobjectArray, jobjectArray, jobject);
+  (JNIEnv *, jobject, jstring, jobjectArray, jobjectArray, jobject);
 
 #ifdef __cplusplus
 }

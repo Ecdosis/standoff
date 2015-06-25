@@ -25,7 +25,7 @@ if [ $USER = "root" ]; then
   JDKINCMD="$JDKINC/linux"
   gcc -c -DHAVE_EXPAT_CONFIG_H -DHAVE_MEMMOVE -DJNI -I$JDKINC -I$JDKINCMD -Iinclude -Iinclude/STIL \
     -O0 -Wall -g3 -fPIC src/*.c src/STIL/*.c
-  gcc *.o -shared -o libAeseFormatter.$LIBSUFFIX
+  gcc *.o -shared -licuuc -o libAeseFormatter.$LIBSUFFIX
   mv libAeseFormatter.$LIBSUFFIX /usr/local/lib/
   rm *.o
 else
