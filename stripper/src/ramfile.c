@@ -73,7 +73,7 @@ int ramfile_write( ramfile *rf, const UChar *data, int len )
         UChar *tmp = calloc( new_size, sizeof(UChar) );
         if ( tmp != NULL )
         {
-            memcpy( tmp, rf->buf, rf->used );
+            u_strncpy( tmp, rf->buf, rf->used );
             rf->allocated = new_size;
             tmp[rf->used] = 0;
             free( rf->buf );
@@ -85,7 +85,7 @@ int ramfile_write( ramfile *rf, const UChar *data, int len )
             return 0;
         }  
     }
-    memcpy( &rf->buf[rf->used], data, len );
+    u_strncpy( &rf->buf[rf->used], data, len );
     rf->used += len;
     rf->buf[rf->used] = 0;
     return len;
