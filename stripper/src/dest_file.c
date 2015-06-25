@@ -352,21 +352,37 @@ layer *dest_file_layer( dest_file *df )
     return df->l;
 }
 /**
- * Write to the file
+ * Write to the esoteric DST which may be a disk file or a ramfile
  * @param df the dest file object
  * @param data the data to write
- * @param len the length of the data
- * @return the number of chars written or 0 on failure
+ * @param len the length of the data in chars
+ * @return the number of CHARS written or 0 on failure
  */
 int dest_file_write( dest_file *df, UChar *data, int len )
 {
     int res = 0;
-    int u_len = len;
     df->len += len;
+    res = DST_WRITE(data,len,df->dst);
+    if ( res == len )
+        return res;
+    else
+        return 0;
+}
+/**
+ * This actually write utf8 stuff to an actual file
+ * @param df the FILE object
+ * @param data the UTF-16 data
+ * @param len the number of UTF-16 chars
+ * @return the number of CHARS written to the actual file
+ */
+int dest_file_write_utf8( FILE *f, UChar *data, int len )
+{
+    int res = 0;
+    int u_len = len;
     char *utf8txt = utf16toutf8Len( data, &len );
     if ( utf8txt != NULL )
     {
-        res = DST_WRITE(utf8txt,len,df->dst);
+        res = fwrite(utf8txt,1,len,f);
         free( utf8txt );
     }
     if ( res == len )

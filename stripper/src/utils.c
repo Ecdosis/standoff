@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "memwatch.h"
 
 /**
  * Convert an int to a ustr

@@ -34,8 +34,9 @@
 #include "STIL.h"
 #include "error.h"
 #include "encoding.h"
-#include "memwatch.h"
 #include "stack.h"
+#include "utils.h"
+#include "memwatch.h"
 static UChar *U_COMMA;
 static UChar *U_COMMANL;
 static UChar *U_LF;
@@ -246,7 +247,6 @@ int STIL_write_range( UChar *name, UChar **atts, int removed,
     dest_file *dst )
 {
 	int res=1;
-	int n;
     stack *tofree = stack_create();
     if ( tofree != NULL )
     {
@@ -313,7 +313,6 @@ int STIL_write_range( UChar *name, UChar **atts, int removed,
             write_utf16_array( write_array, size, dst );
             while ( !stack_empty(tofree) )
                 free( stack_pop(tofree));
-            return res;
         }
         stack_delete(tofree);
     }

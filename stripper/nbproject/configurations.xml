@@ -17,6 +17,7 @@
       <itemPath>include/hh_exceptions.h</itemPath>
       <itemPath>include/layer.h</itemPath>
       <itemPath>include/log.h</itemPath>
+      <itemPath>include/memwatch.h</itemPath>
       <itemPath>include/milestone.h</itemPath>
       <itemPath>include/ramfile.h</itemPath>
       <itemPath>include/range.h</itemPath>
@@ -85,6 +86,7 @@
           </incDir>
           <preprocessorList>
             <Elem>COMMANDLINE</Elem>
+            <Elem>MEMWATCH</Elem>
           </preprocessorList>
         </cTool>
         <linkerTool>
@@ -127,6 +129,8 @@
       <item path="include/layer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/log.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/memwatch.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/milestone.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -232,6 +236,8 @@
       <item path="include/layer.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/log.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/memwatch.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/milestone.h" ex="false" tool="3" flavor2="0">
       </item>

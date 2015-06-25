@@ -164,8 +164,7 @@ static void XMLCALL start_element_scan( void *userData,
             && recipe_has_rule(userdata_rules(u),u_name,new_atts) )
             simple_name = recipe_simplify( userdata_rules(u), u_name, new_atts );
         r = range_new( stack_empty(userdata_ignoring(u))?0:1,
-            simple_name,
-            new_atts, userdata_toffset(u) );
+            simple_name, new_atts, userdata_toffset(u) );
         if ( r != NULL )
         {
             // stack has to set length when we get to the range end
@@ -632,7 +631,7 @@ void stripper_dispose( stripper *s )
             free( s->hh_except_string );
         if ( s->hh_except != NULL )
             hh_exceptions_dispose( s->hh_except );
-        if ( s->style != NULL )
+        if ( s->style != NULL && s->style != U_TEI )
             free( s->style );
         if ( s->language != U_ENGB && s->language != NULL )
             free( s->language );
@@ -804,15 +803,15 @@ JNIEXPORT jint JNICALL Java_calliope_AeseStripper_strip
         if ( hhe != NULL )
         {
             s->user_data = userdata_create( s->language, s->barefile, 
-                ruleset, &stil_format, hhe );
+                ruleset, s->f, hhe );
             if ( s->user_data != NULL )
             {
                 // write header
                 int i=0;
                 while ( res && userdata_markup_dest(s->user_data,i)!= NULL )
                 {
-                    res = stil_format.hfunc( NULL, 
-                        dest_file_dst(userdata_markup_dest(s->user_data,i)), 
+                    res = s->f->hfunc( NULL, 
+                        userdata_markup_dest(s->user_data,i), 
                         (jchar*)s_str );
                     i++;
                 }

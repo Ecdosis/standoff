@@ -5,6 +5,7 @@
 #include <unicode/ustring.h>
 #include "milestone.h"
 #include "utils.h"
+#include "memwatch.h"
 
 /**
  * Milestone elements in XML typically cover a range but are used 
