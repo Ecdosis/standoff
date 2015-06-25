@@ -33,10 +33,6 @@
 #include "memwatch.h"
 #define MAX_TAGLEN 128
 #define MIN_TEXTLEN 512
-static char U_RELOFF[] = {'r','e','l','o','f','f'};
-static char U_NAME[] = {'n','a','m','e'};
-static char U_LEN[] = {'l','e','n'};
-static char U_REMOVED[] = {'r','e','m','o','v','e','d'};
 struct range_struct
 {
     /** the name of the range's property */
@@ -71,9 +67,9 @@ range *range_create_atts( const char **atts )
         r->rightmost = 1;
         while ( atts[i] != NULL )
         {
-            if ( strcmp(atts[i],U_RELOFF)== 0 )
+            if ( strcmp(atts[i],"reloff")== 0 )
                 r->reloff = atoi((char*)atts[i+1]);
-            else if ( strcmp(atts[i],U_NAME)==0 )
+            else if ( strcmp(atts[i],"name")==0 )
             {
                 r->name = strdup((char*)atts[i+1]);
                 if ( r->name == NULL )
@@ -85,9 +81,9 @@ range *range_create_atts( const char **atts )
                     break;
                 }
             }
-            else if ( strcmp(atts[i],U_LEN)==0 )
+            else if ( strcmp(atts[i],"len")==0 )
                 r->len = atoi( (char*)atts[i+1] );
-            else if ( strcmp(atts[i],U_REMOVED)==0 )
+            else if ( strcmp(atts[i],"removed")==0 )
             {
                 warning( "range: attempt to create removed range\n");
                 free( r );
@@ -122,7 +118,8 @@ range *range_create_empty()
  */
 range *range_copy( range *r )
 {
-    range *r2 = range_create( r->name, r->html_name, r->start, r->len );
+    range *r2 = range_create( r->name, r->html_name, r->start, r->len, 
+        r->removed );
     if ( r2 != NULL )
     {
         annotation *a = r->annotations;
@@ -145,9 +142,11 @@ range *range_copy( range *r )
  * @param html_name the range's mapped html name
  * @param start its start offset inside the text
  * @param len its length
+ * @param removed 1 if this range is removed
  * @return the finished range
  */
-range *range_create( char *name, char *html_name, int start, int len )
+range *range_create( char *name, char *html_name, int start, int len, 
+    int removed )
 {
     range *r = calloc( 1, sizeof(range) );
 	if ( r != NULL )
@@ -158,6 +157,7 @@ range *range_create( char *name, char *html_name, int start, int len )
         r->start = start;
         r->len = len;
         r->rightmost = 1;
+        r->removed = removed;
     }
     else
         warning("range creation failed\n");
@@ -442,7 +442,7 @@ range *range_split_delete( range *r, range *q )
     }
     else
     {
-        range *q2 = range_create( r->name, r->html_name, r->start, r->len );
+        range *q2 = range_create( r->name, r->html_name, r->start, r->len, 0 );
         if ( q2 != NULL )
         {
             q2->start = range_end(q);

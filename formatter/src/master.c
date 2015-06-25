@@ -16,7 +16,6 @@
 #include "STIL/STIL.h"
 #include "error.h"
 #include "utils.h"
-
 #include "memwatch.h"
 static format stil_format;
 static char error_string[128] = "";

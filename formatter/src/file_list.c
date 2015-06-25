@@ -253,6 +253,8 @@ static int file_list_load_data( file_list *fl, int index, void **data,
                                     res = convert_from_encoding( cdata, n, 
                                         (UChar*)*data, needed+1, "UTF-8" );
                                     *len = needed;
+                                    // no longer needed
+                                    free( cdata );
                                 }
                             }
                             else

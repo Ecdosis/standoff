@@ -28,8 +28,8 @@
 #include "css_selector.h"
 #include "css_rule.h"
 #include "error.h"
-#include "memwatch.h"
 #include "utils.h"
+#include "memwatch.h"
 
 static char U_NAME[] = {'n','a','m','e'};
 static char U_VALUE[] = {'v','a','l','u','e'};

@@ -22,7 +22,7 @@
 
 typedef struct node_struct node;
 node *node_create( char *name, char *html_name, int offset, int len, 
-     int empty, int rightmost );
+     int empty, int rightmost, int removed );
 void node_dispose( node *n );
 void node_add_child( node *n, node *c );
 void node_add_sibling( node *n, node *sibling );

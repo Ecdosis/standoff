@@ -286,7 +286,7 @@ static UChar *remove_text( range_array *removals, UChar *text, int *len )
 static int formatter_add_root_range( formatter *f, int tlen )
 {
     int res = 1;
-    range *root = range_create( "root", NULL, 0, tlen );
+    range *root = range_create( "root", NULL, 0, tlen, 0 );
     if ( root == NULL )
     {
         fprintf(stderr,"formatter: failed to create document root\n");

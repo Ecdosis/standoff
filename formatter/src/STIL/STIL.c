@@ -43,9 +43,9 @@
 #include "cJSON.h"
 #include "STIL/STIL.h"
 #include "plain_text.h"
-#include "memwatch.h"
 #include "error.h"
 #include "encoding.h"
+#include "memwatch.h"
 
 #ifdef XML_LARGE_SIZE
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
@@ -86,6 +86,7 @@ void stil_parse( cJSON *root, struct userdata_struct *u )
                     if ( strcmp(field->string,"name")==0 )
                     {
                         range_set_name( u->current, field->valuestring );
+                        //printf("%s\n",field->valuestring);
                     }
                     else if ( strcmp(field->string,"len")==0 )
                     {

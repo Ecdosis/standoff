@@ -27,7 +27,7 @@ int range_compare( void *key1, void *key2 );
 range *range_create_atts( const char **atts );
 range *range_copy( range *r );
 range *range_create_empty();
-range *range_create( char *name, char *html_name, int start, int len );
+range *range_create( char *name, char *html_name, int start, int len, int removed );
 void range_dispose( range *r );
 range **range_randomise( int n, int t_len, const char *text, int n_tags, 
     char **props, unsigned int seed );

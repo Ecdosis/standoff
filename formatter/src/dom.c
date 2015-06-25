@@ -186,7 +186,7 @@ static node *dom_range_to_node( dom *d, range *r )
     char *html_name = range_html_name(r);
     node *n = node_create( range_name(r),range_html_name(r),range_start(r),
         range_len(r), (html_name==NULL)?0:html_is_empty(html_name), 
-        range_get_rightmost(r) );
+        range_get_rightmost(r), range_get_removed(r) );
     if ( n != NULL )
     {
         annotation *ann = range_get_annotations( r );

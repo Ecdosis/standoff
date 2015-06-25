@@ -52,10 +52,11 @@ struct node_struct
  * @param len the node's range's length
  * @param rightmost is this the rightmost in a series of split nodes?
  * @param empty 1 if the html element is empty
- * @return the newly formed node
+ * @param removed 1 if this node has been removed
+ * @return the newly formed node or null if it was invalid
  */
 node *node_create( char *name, char *html_name, int offset, int len, 
-    int empty, int rightmost )
+    int empty, int rightmost, int removed )
 {
     node *n = calloc( 1, sizeof(node) );
 	if ( n != NULL )
@@ -69,11 +70,10 @@ node *node_create( char *name, char *html_name, int offset, int len,
         n->len = len;
         n->empty = empty;
         n->rightmost = rightmost;
-        if ( n->empty > 1 )
-            printf("empty>1\n");
         if ( len == 0 )
         {
-            warning("Length must not be 0\n");
+            if ( !removed )
+                warning("Length should not be 0 for element %s\n",html_name);
             node_dispose( n );
             n = NULL;
         }
@@ -350,7 +350,7 @@ int node_end( node *n )
 void node_split( node *n, int pos )
 {
     node *next = node_create( n->name, n->html_name, pos, node_end(n)-pos,
-        html_is_empty(n->html_name), n->rightmost );
+        html_is_empty(n->html_name), n->rightmost, 0 );
     attribute *attr = n->attrs;
     while ( attr != NULL )
     {
@@ -525,7 +525,7 @@ int node_overlaps_on_right( node *n, node *r )
 range *node_to_range( node *n )
 {
     range *r = range_create( node_name(n), node_html_name(n), node_offset(n), 
-        node_len(n) ); 
+        node_len(n), 0 ); 
     range_set_rightmost( r, n->rightmost );
     attribute *attr = n->attrs;
     while ( attr != NULL )
