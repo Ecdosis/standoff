@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "milestone.h"
 #include "layer.h"
+#include "utils.h"
 #include "memwatch.h"
 /**
  * A layer of markup is created from a list of milestones. There may be 
@@ -9,7 +12,7 @@
  */
 struct layer_struct 
 {
-    char *name;
+    UChar *name;
     milestone *milestones;
 };
 /**
@@ -18,12 +21,12 @@ struct layer_struct
  * @param milestones a linked list of milestone objects
  * @return an initialised layer object
  */
-layer *layer_create( char *name, milestone *milestones )
+layer *layer_create( UChar *name, milestone *milestones )
 {
     layer *l = calloc( 1, sizeof(layer) );
     if ( l != NULL )
     {
-        l->name = strdup( name );
+        l->name = u_strdup( name );
         if ( l->name==NULL )
         {
             l = layer_dispose( l );
@@ -51,7 +54,7 @@ layer *layer_dispose( layer *l )
  * @param l the layer in question
  * @return its name as a string
  */
-char *layer_name( layer *l )
+UChar *layer_name( layer *l )
 {
     return l->name;
 }
@@ -61,7 +64,7 @@ char *layer_name( layer *l )
  * @param mname the desired milestone name (xml name)
  * @return 1 if present else 0
  */
-int layer_has_milestone( layer *l, char *mname )
+int layer_has_milestone( layer *l, UChar *mname )
 {
     return milestone_contains( l->milestones, mname );
 }

@@ -1,17 +1,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "milestone.h"
 #include "layer.h"
 #ifdef JNI
 #include "ramfile.h"
 #endif
-#include "format.h"
 #include "range.h"
 #include "dest_file.h"
+#include "format.h"
 #include "log.h"
 #include "hashmap.h"
+#include "encoding.h"
 #include "memwatch.h"
+
 /**
  * Manage the contents of an output file in memory or for writing to disk.
  */
@@ -20,7 +24,7 @@ struct dest_file_struct
     dest_kind kind;
     char *midname;
     char *name;
-    char *buffer;
+    UChar *buffer;
     // only needed by markup dest files
     int first;
     // previous offset used by markup files
@@ -128,7 +132,7 @@ static int compute_range_lengths( dest_file *df, int tlen )
         {
             while ( hashmap_iterator_has_next(iter) )
             {
-                char *key = hashmap_iterator_next(iter);
+                UChar *key = hashmap_iterator_next(iter);
                 range *t = hashmap_get( map, key );
                 range_set_len( t, tlen-range_get_start(t) );
             }
@@ -216,7 +220,8 @@ static int dest_file_dequeue( dest_file *df )
         for ( i=0;i<len;i++ )
         {
             r = array[i];
-            res = df->f->rfunc( 
+            format_write_range rfunc = format_rfunc(df->f);
+            res = (rfunc)( 
                 range_get_name(r),
                 range_get_atts(r),
                 range_removed(r),
@@ -225,7 +230,7 @@ static int dest_file_dequeue( dest_file *df )
                 range_get_content(r),
                 range_get_content_len(r),
                 dest_file_first(df), 
-                dest_file_dst(df) );
+                df );
             dest_file_set_first( df, 0 );
             range_delete( r );
             if ( !res )
@@ -266,7 +271,10 @@ int dest_file_close( dest_file *df, int tlen )
 #endif
         // write tail
         if ( res )
-            res = df->f->tfunc(NULL, dest_file_dst(df) );
+        {
+            format_write_tail tfunc = format_tfunc(df->f);
+            res = tfunc(NULL, df );
+        }
 #ifdef JNI        
         tmplog("df->f->tfunc returned %d\n",res);
 #endif
@@ -348,12 +356,24 @@ layer *dest_file_layer( dest_file *df )
  * @param df the dest file object
  * @param data the data to write
  * @param len the length of the data
- * @return the number of chars written
+ * @return the number of chars written or 0 on failure
  */
-int dest_file_write( dest_file *df, char *data, int len )
+int dest_file_write( dest_file *df, UChar *data, int len )
 {
+    int res = 0;
+    int u_len = len;
     df->len += len;
-    return DST_WRITE(data,len,df->dst);
+    char *utf8txt = utf16toutf8Len( data, &len );
+    if ( utf8txt != NULL )
+    {
+        res = DST_WRITE(utf8txt,len,df->dst);
+        free( utf8txt );
+    }
+    if ( res == len )
+        res = u_len;
+    else
+        res = 0;
+    return res;
 }
 /**
  * Open the destination file
@@ -365,8 +385,9 @@ int dest_file_open( dest_file *df )
     return ( df->dst != NULL );
 #else
     int res = 0;
-    const char *suffix = (df->kind==text_kind)?df->f->text_suffix
-        :df->f->markup_suffix;
+    const char *m_suffix = format_markup_suffix(df->f);
+    const char *t_suffix = format_text_suffix(df->f);
+    const char *suffix = (df->kind==text_kind)?t_suffix:m_suffix;
     int len = strlen(df->name)+strlen(suffix)+strlen(df->midname)+1;
     char *markup = malloc( len );
 	if ( markup != NULL )

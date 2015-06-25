@@ -21,7 +21,7 @@ typedef struct userdata_struct userdata;
 #define HYPHEN_ONLY 1
 #define HYPHEN_LF 2
 
-userdata *userdata_create( const char *language, char *barefile, recipe *rules, 
+userdata *userdata_create( UChar *language, char *barefile, recipe *rules, 
         format *fmt, hh_exceptions *hhe );
 void userdata_dispose( userdata *u );
 int userdata_toffset( userdata *u );
@@ -42,7 +42,7 @@ dest_file *userdata_markup_dest( userdata *u, int i );
 recipe *userdata_rules( userdata *u );
 stack *userdata_ignoring( userdata *u );
 stack *userdata_range_stack( userdata *u );
-dest_file *userdata_get_markup_dest( userdata *u, char *range_name );
+dest_file *userdata_get_markup_dest( userdata *u, UChar *range_name );
 int userdata_has_hh_exception( userdata *u, char *combination );
 dest_file *userdata_text_dest( userdata *u );
 #ifdef JNI

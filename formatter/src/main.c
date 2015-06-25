@@ -23,6 +23,9 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #include "css_property.h"
 #include "css_selector.h"
 #include "hashmap.h"
@@ -32,13 +35,13 @@
 #include "css_rule.h"
 #include "hashset.h"
 #include "range_array.h"
-#include "master.h"
 #include "formatter.h"
 #include "css_parse.h"
 #include "file_list.h"
 #include "AESE/AESE.h"
 #include "STIL/STIL.h"
 #include "error.h"
+#include "master.h"
 #include "memwatch.h"
 #ifdef XML_LARGE_SIZE
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
@@ -50,22 +53,18 @@
 #define XML_FMT_INT_MOD "l"
 #endif
 #define DEFAULT_HTML_FILE "output.html"
-#define DEFAULT_XML_FILE "output.xml"
-#define DEFAULT_MARKDOWN_FILE "output.md"
 /*
  * Combine a stripped standoff markup file (initially only in STIL),
- * a plain text file and a CSS file into a HTML/XML/Markdown file.
+ * a plain text file and a CSS file into a HTML file.
  * Created 26/10/2010
  * Revised 17/6/2011
- * Revised 28/3/2014
- * (c) Desmond Schmidt 2011,2014
+ * (c) Desmond Schmidt 2011
  */
 static file_list *css_files;
 static file_list *markup_files;
 static file_list *text_file;
-static char *format_name="STIL";
-static output_fmt_type output_format=HTML;
-static char out_file_name[FILE_NAME_LEN];
+static char format_name[]={'S','T','I','L'};
+static char html_file_name[FILE_NAME_LEN];
 
 /** if doing help or version info don't process anything */
 static int doing_help = 0;
@@ -79,37 +78,16 @@ static void print_help()
 {
 	fprintf( stderr,
 		"usage: formatter [-h] [-v] [-l] [-w] [-f format] -c css-files "
-			"-m markup-files -t text-file [out-file]\n"
+			"-m markup-files -t text-file [html-file]\n"
 		"formatter combines a plain text file, its stripped "
 			"markup file and a\nCSS file into HTML. "
 		"Options are: \n"
 		"-h print this help message\n"
 		"-v print the version information\n"
-		"-f the markup format\n"
 		"-l list supported formats\n"
-        "-o the output format (HTML|XML|Markdown)"
 		"-c colon-separated list of css files (required)\n"
 		"-m colon-separated list of markup file names (required)\n"
 		"-t file the name of the base text file (required)\n");
-}
-/**
- * Default output file is based on the file type
- * @return a suitable default output file name
- */
-static char *default_out_file()
-{
-    switch ( output_format )
-    {
-        case HTML: default:
-            return "output.html";
-            break;
-        case XML:
-            return "output.xml";
-            break;
-        case Markdown:
-            return "output.md";
-            break;
-    }
 }
 /**
  * Check the commandline arguments
@@ -123,7 +101,6 @@ static int check_args( int argc, char **argv )
 	markup_files = NULL;
     css_files = NULL;
     text_file = NULL;
-    char buf[128];
 	if ( argc < 7 )
 		sane = 0;
 	else
@@ -136,44 +113,17 @@ static int check_args( int argc, char **argv )
 				switch ( argv[i][1] )
 				{
 					case 'v':
-						fprintf( stderr, "formatter version 3.0 (c) "
-								"Desmond Schmidt 2014\n");
+						fprintf( stderr, "formatter version 2.0 (c) "
+								"Desmond Schmidt 2011\n");
 						doing_help = 1;
 						break;
 					case 'h':
 						print_help();
 						doing_help = 1;
 						break;
-					case 'f':
-						if ( i < argc-1 )
-							format_name = argv[i+1];
-						else
-							sane = 0;
-						break;
 					case 'l':
-						printf("%s",master_list(buf,128));
+						u_printf("%s",master_list());
 						doing_help = 1;
-						break;
-					case 'o':
-						if ( i < argc-1 )
-                        {
-                            if ( strcmp(argv[i+1],"HTML")==0 )
-                                output_format = HTML;
-                            else if ( strcmp(argv[i+1],"XML")==0 )
-                                output_format = XML;
-                            else if ( strcmp(argv[i+1],"Markdown")==0 )
-                                output_format = Markdown;
-                            else
-                            {
-                                sane = 0;
-                                printf("invalid output format %s\n",argv[i+1]);
-                                output_format = UNKNOWN;
-                            }
-                        }
-						else
-                        {
-                            sane = 0;
-                        }
 						break;
 					case 'c':
 						if ( i < argc-1 )
@@ -214,9 +164,9 @@ static int check_args( int argc, char **argv )
                 if ( !file_list_contains(css_files,argv[argc-1])
                     && !file_list_contains(text_file,argv[argc-1])
                     && !file_list_contains(markup_files,argv[argc-1]) )
-                    strncpy( out_file_name, argv[argc-1], FILE_NAME_LEN );
+                    strncpy( html_file_name, argv[argc-1], FILE_NAME_LEN );
                 else
-                    strncpy( out_file_name, default_out_file(), 
+                    strncpy( html_file_name, DEFAULT_HTML_FILE, 
                         FILE_NAME_LEN );
 			}
 		}
@@ -228,8 +178,8 @@ static int check_args( int argc, char **argv )
  */
 static void usage()
 {
-	fprintf( stderr,"usage: formatter [-h] [-v] [-l] [-w] [-f format] -c css "
-		"-m markup -t text-file [out-file]\n"
+	fprintf( stderr,"usage: formatter [-h] [-v] [-l] [-w] -c css "
+		"-m markup -t text-file [html-file]\n"
 		"type: \"formatter -h\" for help\n");
 }
 /**
@@ -243,11 +193,11 @@ int main( int argc, char **argv )
 	{
 		if ( !doing_help )
 		{
-            char *data,*text;
+            UChar *data,*text;
             int i,len;
             if ( file_list_load(text_file,0,&text,&len) )
             {
-                master *hf = master_create( text, len, output_format );
+                master *hf = master_create( text, len );
                 for ( i=0;i<file_list_size(markup_files);i++ )
                 {
                     res = file_list_load(markup_files,i,&data,&len);
@@ -270,11 +220,11 @@ int main( int argc, char **argv )
                             data = NULL;
                         }
                     }
-                    output = fopen( out_file_name, "w" );
+                    output = fopen( html_file_name, "w" );
                     if ( output != NULL )
                     {
                         char *html = master_convert( hf );
-                        fwrite( html, 1, master_get_output_len(hf), output );
+                        fwrite( html, 1, master_get_html_len(hf), output );
                         fclose( output );
                     }
                 }

@@ -3,6 +3,9 @@
 #include <string.h>
 #include <wchar.h>
 #include <ctype.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #ifdef JNI
 #include <jni.h>
 #include "log.h"
@@ -16,13 +19,14 @@
 #include "stack.h"
 #include "hashmap.h"
 #include "ramfile.h"
-#include "format.h"
 #include "range.h"
 #include "dest_file.h"
+#include "format.h"
 #include "hh_exceptions.h"
 #include "userdata.h"
 #include "aspell.h"
 #include "utils.h"
+#include "encoding.h"
 #include "memwatch.h"
 struct userdata_struct
 {
@@ -70,7 +74,7 @@ static int open_dest_files( userdata *u, char *barefile, format *fmt )
         {
             // always at least one markup df is needed
             dest_file *df = dest_file_create( markup_kind, NULL, 
-                (char*)fmt->middle_name, barefile, fmt );
+                (char*)format_middle_name(fmt), barefile, fmt );
             if ( df != NULL && u->rules != NULL )
             {
                 // ask the recipe which markup files to create
@@ -82,25 +86,28 @@ static int open_dest_files( userdata *u, char *barefile, format *fmt )
                     for ( i=1;i<=n_layers;i++ )
                     {
                         layer *l = recipe_layer( u->rules, i-1 );
-                        char *name = layer_name( l );
-                        int mlen = strlen(fmt->middle_name)
-                            +strlen(name)+2;
-                        char *mid_name = malloc( mlen );
-                        if ( mid_name != NULL )
+                        UChar *name = layer_name( l );
+                        char *c_name = utf16toutf8(name);
+                        if ( c_name != NULL )
                         {
-                            snprintf( mid_name, mlen, "%s-%s", 
-                                fmt->middle_name, name );
-                            //dest_kind kind, layer *l, char *midname, 
-                            //char *name, format *f
-                            u->markup_dest[i] = dest_file_create( markup_kind,
-                                l, mid_name, barefile, fmt );
-                            free( mid_name );
-                        }
-                        else
-                        {
-                            fprintf(stderr,
-                                "stripper: failed to allocate name\n");
-                            break;
+                            int mlen = strlen(format_middle_name(fmt))
+                                +strlen(c_name)+2;
+                            char *mid_name = malloc( mlen );
+                            if ( mid_name != NULL )
+                            {
+                                snprintf( mid_name, mlen, "%s-%s", 
+                                    format_middle_name(fmt), c_name );
+                                u->markup_dest[i] = dest_file_create( markup_kind,
+                                    l, mid_name, barefile, fmt );
+                                free( mid_name );
+                            }
+                            else
+                            {
+                                fprintf(stderr,
+                                    "stripper: failed to allocate name\n");
+                                break;
+                            }
+                            free(c_name);
                         }
                     }
                     if ( i == n_layers )
@@ -130,7 +137,7 @@ static int open_dest_files( userdata *u, char *barefile, format *fmt )
  * @param fmt the format object containing function pointers
  * @return a complete userdata object or NULL
  */
-userdata *userdata_create( const char *language, char *barefile, recipe *rules, 
+userdata *userdata_create( UChar *language, char *barefile, recipe *rules, 
     format *fmt, hh_exceptions *hhe )
 {
     int err = 0;
@@ -143,7 +150,12 @@ userdata *userdata_create( const char *language, char *barefile, recipe *rules,
         u->spell_config = new_aspell_config();
         if ( u->spell_config != NULL )
         {
-            aspell_config_replace( u->spell_config, "lang", language );
+            char *c_language = utf16toutf8(language);
+            if ( c_language != NULL )
+            {
+                aspell_config_replace( u->spell_config, "lang", c_language );
+                free( c_language);
+            }
             AspellCanHaveError *possible_err 
                 = new_aspell_speller(u->spell_config);
             u->spell_checker = 0;
@@ -224,7 +236,7 @@ void userdata_dispose( userdata *u )
 }
 #ifdef JNI
 static int set_string_field( JNIEnv *env, jobject obj, 
-    const char *field_name, char *value )
+    const char *field_name, UChar *value )
 {
     int res = 0;
     jfieldID fid;
@@ -235,7 +247,7 @@ static int set_string_field( JNIEnv *env, jobject obj,
     fid = (*env)->GetFieldID(env, cls, field_name, "Ljava/lang/String;");
     if (fid != NULL) 
     {
-        jstr = (*env)->NewStringUTF( env, value );
+        jstr = (*env)->NewString( env, value, u_strlen(value) );
         if (jstr != NULL) 
         {
             (*env)->SetObjectField(env, obj, fid, jstr);
@@ -244,12 +256,12 @@ static int set_string_field( JNIEnv *env, jobject obj,
     }
     return res;
 }
-static int add_layer( JNIEnv *env, jobject obj, char *value, char *name )
+static int add_layer( JNIEnv *env, jobject obj, UChar *value, char *name )
 {
     int res = 0;
     jstring jstr;
     jstring jname;
-    jstr = (*env)->NewStringUTF( env, value );
+    jstr = (*env)->NewString( env, value, u_strlen(value) );
     jname = (*env)->NewStringUTF( env, name );
     if (jstr != NULL && jname!= NULL ) 
     {
@@ -357,7 +369,7 @@ dest_file *userdata_text_dest( userdata *u )
  * @param range_name the range name
  * @return the appropriate dest_file object
  */
-dest_file *userdata_get_markup_dest( userdata *u, char *range_name )
+dest_file *userdata_get_markup_dest( userdata *u, UChar *range_name )
 {
     if ( hashmap_contains(u->dest_map,range_name) )
     {

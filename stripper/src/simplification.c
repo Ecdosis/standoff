@@ -1,13 +1,16 @@
 #include <stdlib.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "attribute.h"
 #include "simplification.h"
 #include "error.h"
+#include "utils.h"
 #include "memwatch.h"
 struct simplification_struct
 {
-    char *xml_name;
-    char *prop_name;
+    UChar *xml_name;
+    UChar *prop_name;
     attr1bute **attributes;
 };
 /**
@@ -16,23 +19,23 @@ struct simplification_struct
  * @param prop_name the aese property name
  * @return a simplification rule
  */
-simplification *simplification_new( const char *xml_name,
-    const char *prop_name )
+simplification *simplification_new( UChar *xml_name, UChar *prop_name )
 {
     simplification *s = malloc( sizeof(simplification) );
     if ( s == NULL )
         error( "recipe: failed to allocate rule\n" );
-    s->xml_name = malloc(strlen(xml_name)+1 );
-    if ( s->xml_name == NULL )
-        error( "recipe: failed to allocate xml name\n");
-    s->prop_name = malloc( strlen(prop_name)+1 );
-    if ( s->prop_name == NULL )
-        error( "recipe: failed to allocate aese name\n");
-    strcpy( s->xml_name, xml_name );
-    strcpy( s->prop_name, prop_name );
-    s->attributes = calloc( 1, sizeof(attr1bute*) );
-    if ( s->attributes == NULL )
-        error( "recipe: failure to allocate attributes\n");
+    else
+    {
+        s->xml_name = u_strdup(xml_name );
+        if ( s->xml_name == NULL )
+            error( "recipe: failed to allocate xml name\n");
+        s->prop_name = u_strdup(prop_name);
+        if ( s->prop_name == NULL )
+            error( "recipe: failed to allocate aese name\n");
+        s->attributes = calloc( 1, sizeof(attr1bute*) );
+        if ( s->attributes == NULL )
+            error( "recipe: failure to allocate attributes\n");
+    }
     return s;
 }
 /**
@@ -41,7 +44,7 @@ simplification *simplification_new( const char *xml_name,
  * @param attrs the list of attributes in expat fprmat
  * @return 1 if all the attributes in the rule are present in the list, else 0
  */
-int simplification_contains( simplification *s, char **attrs )
+int simplification_contains( simplification *s, UChar **attrs )
 {
     int i = 0;
     while ( s->attributes[i] != NULL )
@@ -95,7 +98,7 @@ void simplification_add_attribute( simplification *s, attr1bute *a )
  * @param s the simplification rule in question
  * @param attrs the expat attribute list (copied)
  */
-void simplification_remove_attribute( simplification *s, char **attrs )
+void simplification_remove_attribute( simplification *s, UChar **attrs )
 {
     int i = 0;
     while ( s->attributes[i] != NULL )
@@ -106,7 +109,7 @@ void simplification_remove_attribute( simplification *s, char **attrs )
  * @param s the simplification rule in question
  * @return its xml name
  */
-char *simplification_get_xml_name( simplification *s )
+UChar *simplification_get_xml_name( simplification *s )
 {
     return s->xml_name;
 }
@@ -115,7 +118,7 @@ char *simplification_get_xml_name( simplification *s )
  * @param s the simplification rule in question
  * @return its xml name
  */
-char *simplification_get_prop_name( simplification *s )
+UChar *simplification_get_prop_name( simplification *s )
 {
     return s->prop_name;
 }

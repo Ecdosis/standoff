@@ -1,19 +1,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "range.h"
 #include "error.h"
+#include "utils.h"
 #include "memwatch.h"
 /** we push half-finished ranges onto the stack then
  * complete them when we get to the corresponding end-tags */
 struct range_struct
 {
-	char *name;
-	char **atts;
+	UChar *name;
+	UChar **atts;
 	int start;
 	int len;
     int removed;
-    char *content;
+    UChar *content;
     int content_len;
 	struct range_struct *next;
 };
@@ -25,14 +28,14 @@ struct range_struct
  * @param offset the range's absolute offset
  * @return
  */
-range *range_new( int removed, char *name, char **atts, int offset )
+range *range_new( int removed, UChar *name, UChar **atts, int offset )
 {
-    range *r = malloc( sizeof(range) );
+    range *r = calloc( 1, sizeof(range) );
     if ( r == NULL )
         error( "range: failed to allocate range structure\n" );
     r->removed = removed;
     r->start = offset;
-    r->name = strdup( name );
+    r->name = u_strdup( name );
     r->content = NULL;
     r->content_len = 0;
     if ( r->name == NULL )
@@ -102,17 +105,17 @@ int range_compare( void *key1, void *key2 )
  * @param s the content
  * @param len its length
  */
-void range_add_content( range *r, const char *s, int len )
+void range_add_content( range *r, const UChar *s, int len )
 {
     if ( r->content_len > 0 )
     {
-        char *new_content = malloc( r->content_len+len+1 );
+        UChar *new_content = calloc( r->content_len+len+1, sizeof(UChar) );
         if ( new_content == NULL )
             error( "range: failed to reallocate content\n");
         else
         {
-            memcpy( new_content, r->content, r->content_len );
-            memcpy( &new_content[r->content_len], s, len );
+            u_strncpy( new_content, r->content, r->content_len );
+            u_strncpy( &new_content[r->content_len], s, len );
             new_content[r->content_len+len] = 0;
             free( r->content );
             r->content = new_content;
@@ -122,13 +125,13 @@ void range_add_content( range *r, const char *s, int len )
     }
     else
     {
-        r->content = malloc( len+1 );
+        r->content = calloc( len+1, sizeof(UChar) );
         if ( r->content == NULL )
             error( "range: failed to allocate new content\n");
-        memcpy( r->content, s, len );
+        u_strncpy( r->content, s, len );
         r->content[len] = 0;
         r->content_len = len;
-       // printf("created content length %d\n",len);
+        // printf("created content length %d\n",len);
     }
 }
 /**
@@ -136,7 +139,7 @@ void range_add_content( range *r, const char *s, int len )
  * @param r the range in question
  * @return its content (usually NULL)
  */
-char *range_get_content( range *r )
+UChar *range_get_content( range *r )
 {
     return r->content;
 }
@@ -154,7 +157,7 @@ int range_get_content_len( range *r )
  * @param r the range in question
  * @return its name
  */
-char *range_get_name( range *r )
+UChar *range_get_name( range *r )
 {
     return r->name;
 }
@@ -163,7 +166,7 @@ char *range_get_name( range *r )
  * @param r the range in question
  * @return its atts in expat format
  */
-char **range_get_atts( range *r )
+UChar **range_get_atts( range *r )
 {
     return r->atts;
 }

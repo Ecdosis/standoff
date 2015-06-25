@@ -1,77 +1,55 @@
 /*
- * C implementation of a hashset for strings
+ * This file is part of formatter.
  *
- * Created on: 17/10/2010
- * (c) Desmond Schmidt 2010
- */
-/* This file is part of stripper.
- *
- *  stripper is free software: you can redistribute it and/or modify
+ *  formatter is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- *  stripper is distributed in the hope that it will be useful,
+ *  formatter is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with stripper.  If not, see <http://www.gnu.org/licenses/>.
+ *  along with formatter.  If not, see <http://www.gnu.org/licenses/>.
+ *  (c) copyright Desmond Schmidt 2011
  */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #include "hashset.h"
+#include "error.h"
+#include "utils.h"
 #include "memwatch.h"
-#define INITIAL_BUCKETS 12
 #define MOD_ADLER 65521
+#define BLOCK_SIZE 24
 #define MAX_RATIO 1.2f
-
+/**
+ * Implement a fixed-size hash table with ids for values
+ */
 struct hashset_struct
 {
-	struct bucket **buckets;
-	int num_buckets;
-	int num_keys;
+    int num_keys;
+    int num_buckets;
+    int id;
+    struct hs_bucket **buckets;
 };
-struct bucket
+struct hs_bucket
 {
-	char *key;
-	int id;
-	struct bucket *next;
+    UChar *key;
+    int id;
+    struct hs_bucket *next;
 };
-/**
- * Create a new hashset
- * @return an allocated hashset structure
- */
-hashset *hashset_create()
-{
-	hashset *set = malloc( sizeof(hashset) );
-	if ( set != NULL )
-	{
-		set->buckets = calloc( INITIAL_BUCKETS, sizeof(struct bucket*) );
-		if ( set->buckets != NULL )
-		{
-			set->num_buckets = INITIAL_BUCKETS;
-			set->num_keys = 0;
-		}
-		else
-		{
-			free( set );
-			set = NULL;
-			printf("failed to allocate hashset\n");
-		}
-	}
-	else
-		printf("couldn't allocate hashset\n");
-	return set;
-}
 /**
  * Hash a string, adler32 method
  * @param data the data to hash
  * @param len its length
  */
-static unsigned hash( unsigned char *data, int len )
+static unsigned hash( UChar *data, int len )
 {
     unsigned a = 1, b = 0;
     int index;
@@ -85,200 +63,298 @@ static unsigned hash( unsigned char *data, int len )
     return (b << 16) | a;
 }
 /**
- * Set the key in a bucket
- * @param b the bucket
- * @param key the key for it
- * @param id the id for the bucket
+ * Create a single new bucket
+ * @param prop the property name for the bucket
+ * @param id its id
+ * @return a finished bucket
  */
-static void bucket_set_key( struct bucket *b, char *key, int id )
+static struct hs_bucket *hs_bucket_create( UChar *prop, int id )
 {
-	b->key = malloc( strlen(key)+1 );
-	if ( b->key == NULL )
-	{
-		printf("failed to allocate store for hashset key\n");
-		exit( 0 );
-	}
-	strcpy( b->key, key );
-	b->id = id;
+    struct hs_bucket *b = calloc( 1, sizeof(struct hs_bucket) );
+    if ( b != NULL )
+    {
+        b->key = u_strdup( prop );
+        b->id = id;
+    }
+    else
+        warning("hs_bucket: failed to create bucket\n");
+    return b;
 }
 /**
- * Reallocate all the keys in a new bucket set that must be
- * 1.5 times bigger than before
- * @param set the set to rehash
+ * Create a new hashset
+ * @return the constructed hashset ready to go
  */
-static void hashset_rehash( hashset *set )
+hashset *hashset_create()
 {
-	int i,old_size = set->num_buckets;
-	set->num_buckets = old_size + (old_size/2);
-	struct bucket **old_buckets = set->buckets;
-	set->buckets = calloc( set->num_buckets, sizeof(struct bucket) );
-	if ( set->buckets == NULL )
+    hashset *hs = calloc( 1, sizeof(hashset) );
+    if ( hs != NULL )
+    {
+        hs->num_buckets = BLOCK_SIZE;
+        hs->id = 1;
+        hs->buckets = calloc( hs->num_buckets, sizeof(struct hs_bucket*) );
+        if ( hs->buckets == NULL )
+        {
+            hashset_dispose( hs );
+            warning("hashset: failed to allocate %d buckets\n",hs->num_buckets);
+            hs = NULL;
+        }
+    }
+    return hs;
+}
+/**
+ * Dispose of a bucket and all its linked siblings
+ * @param b the bucket to dispose
+ */
+static void hs_bucket_dispose( struct hs_bucket *b )
+{
+    if ( b->key != NULL )
+    {
+        free( b->key );
+        b->key = NULL;
+    }
+    if ( b->next != NULL )
+        hs_bucket_dispose( b->next );
+    free( b );
+}
+/**
+ * Dispose of this hashset and all its bucket contents
+ * @param hs the hashset in question
+ */
+void hashset_dispose( hashset *hs )
+{
+    int i;
+    for ( i=0;i<hs->num_buckets;i++ )
+    {
+        if ( hs->buckets[i] != NULL )
+            hs_bucket_dispose( hs->buckets[i] );
+    }
+    free( hs->buckets );
+    hs->buckets = NULL;
+    free( hs );
+}
+/**
+ * Reallocate all the keys in a new bucket map that must be
+ * 1.5 times bigger than before
+ * @param hs the hashset to rehash
+ */
+static int hashset_rehash( hashset *hs )
+{
+#ifdef HASHSET_DEBUG
+      printf("rehashing...\n");
+#endif
+	int i,new_size = hs->num_buckets + hs->num_buckets/2;
+	struct hs_bucket **new_buckets = calloc( new_size, sizeof(struct hs_bucket*) );
+	if ( new_buckets == NULL )
 	{
-		printf("failed to resize hash table\n");
-		exit( 0 );
+		warning("hashset: failed to resize hash table\n");
+        return 0;
 	}
 	// copy the old keys over
-	for ( i=0;i<old_size;i++ )
+	for ( i=0;i<hs->num_buckets;i++ )
 	{
-		struct bucket *b = old_buckets[i];
-		while ( b != NULL )
-		{
-			struct bucket *old = b;
-			hashset_put( set, b->key, b->id );
-			b = b->next;
-			free( old->key );
-			free( old );
-		}
+		if ( hs->buckets[i]!=NULL )
+        {
+            struct hs_bucket *b = hs->buckets[i];		
+            while ( b != NULL )
+            {
+                unsigned slot = hash(b->key,u_strlen(b->key))%new_size;
+                struct hs_bucket *d = hs_bucket_create(b->key,b->id);
+                if ( new_buckets[slot] == NULL )
+                    new_buckets[slot] = d;
+                else
+                {
+                    struct hs_bucket *c = new_buckets[slot];
+                    while ( c->next != NULL )
+                        c = c->next;
+                    c->next = d;
+                }
+                b = b->next;
+            }
+            // gets rid of all connected buckets b
+            hs_bucket_dispose( hs->buckets[i] );
+        }
 	}
-	free( old_buckets );
+	free( hs->buckets );
+    hs->num_buckets = new_size;
+    hs->buckets = new_buckets;
+	return 1;
 }
 /**
- * Set the id for a key. Ignored if not found
- * @param set the hashset to query
- * @param key the key to test for
- * @param the key's id
+ * Add a new name to the hashset and allocate it a unique id
+ * @param hs the hashset in question
+ * @param prop the property to add
+ * @return 1 if successful, else 0
  */
-void hashset_set_id( hashset *set, char *key, int id )
+int hashset_put( hashset *hs, UChar *prop )
 {
-	unsigned hashval = hash( (unsigned char*)key, strlen(key) );
-	int bucket = hashval % set->num_buckets;
-	struct bucket *b = set->buckets[bucket];
-	while ( b != NULL )
-	{
-		// if key already present, just return
-		if ( strcmp(key,b->key)==0 )
-		{
-			b->id = id;
-			break;
-		}
-		else
-			b = b->next;
-	}
+    unsigned slot;
+    struct hs_bucket *b;
+    if ( (float)hs->num_keys/(float)hs->num_buckets > MAX_RATIO )
+    {
+        if ( !hashset_rehash(hs) )
+            return 0;
+    }
+    slot = hash(prop,u_strlen(prop))%hs->num_buckets;
+    b = hs->buckets[slot];
+    if ( b == NULL )
+    {
+        hs->buckets[slot] = hs_bucket_create(prop,hs->id++);
+        if ( hs->buckets[slot] == NULL )
+            return 0;
+    }
+    else
+    {
+        do
+        {
+            // if key already present, just return
+            if ( u_strcmp(prop,b->key)==0 )
+                return 0;
+            else if ( b->next != NULL )
+                b = b->next;
+        }
+        while ( b->next != NULL );
+        // key not found
+        b->next = hs_bucket_create(prop,hs->id++);
+        if ( b->next == NULL )
+            return 0;
+    }
+    hs->num_keys++;
+    return 1;
 }
 /**
- * Get the id for a key
- * @param set the hashset to query
- * @param key the key to test for
- * @return the key's id or -1 if not found
+ * Get the id of the given property or 0 if not there
+ * @param hs the hashset in question
+ * @param prop the property to find
+ * @return id &gt; 0 if found, else 0
  */
-int hashset_get_id( hashset *set, char *key )
+int hashset_get( hashset *hs, UChar *prop )
 {
-	unsigned hashval = hash( (unsigned char*)key, strlen(key) );
-	int bucket = hashval % set->num_buckets;
-	struct bucket *b = set->buckets[bucket];
-	while ( b != NULL )
-	{
-		// if key already present, just return
-		if ( strcmp(key,b->key)==0 )
-			return b->id;
-		else
-			b = b->next;
-	}
-	// not present
-	return -1;
+    unsigned slot = hash(prop,
+        u_strlen(prop))%(unsigned)hs->num_buckets;
+    if ( hs->buckets[slot] == NULL )
+        return 0;
+    else
+    {
+        struct hs_bucket *b = hs->buckets[slot];
+        while ( b != NULL )
+        {
+            if ( u_strcmp(b->key,prop)==0 )
+                return b->id;
+            b = b->next;
+        }
+        return 0;
+    }
 }
 /**
- * Does the hashset contain a key?
- * @param set the hashset to query
- * @param key the key to test for
- * @return 1 if present, 0 otherwise
+ * Get the number of elements stored here
+ * @param hs the hashset in question
+ * @return the number of items
  */
-int hashset_contains( hashset *set, char *key )
+int hashset_size( hashset *hs )
 {
-	unsigned hashval = hash( (unsigned char*)key, strlen(key) );
-	int bucket = hashval % set->num_buckets;
-	struct bucket *b = set->buckets[bucket];
-	while ( b != NULL )
-	{
-		// if key already present, just return
-		if ( strcmp(key,b->key)==0 )
-			return 1;
-		else
-			b = b->next;
-	}
-	// not present
-	return 0;
+    return hs->num_keys;
 }
 /**
- * Put a key into the hashset or test for membership. The
- * destination bucket is decided by modding the hash by
- * the number of bucket slots available. This gives us up
- * to 4 billion buckets maximum.
- * @param set the hashset to add to
- * @param key the key to put in there
- * @param id an optional int to store as its value
- * @return 1 if it was added, 0 otherwise (already there)
+ * Convert the keys to an array
+ * @param hs the hashset in question
+ * @param items an array of items big enough
  */
-int hashset_put( hashset *set, char *key, int id )
+void hashset_to_array( hashset *hs, UChar **items )
 {
-	unsigned hashval = hash( (unsigned char*)key, strlen(key) );
-	int bucket = hashval % set->num_buckets;
-	if ( set->buckets[bucket] == NULL )
-	{
-		set->buckets[bucket] = malloc( sizeof(struct bucket) );
-		if ( set->buckets[bucket] == NULL )
-		{
-			printf("failed to allocate store for hashset bucket\n");
-			exit( 0 );
-		}
-		bucket_set_key( set->buckets[bucket], key, id );
-		set->buckets[bucket]->next = NULL;
-		set->num_keys++;
-		return 1;
-	}
-	else if ( (float)set->num_keys/(float)set->num_buckets > MAX_RATIO )
-	{
-		hashset_rehash( set );
-		return hashset_put( set, key, id );
-	}
-	else // bucket already present
-	{
-		struct bucket *b = set->buckets[bucket];
-		while ( b != NULL )
-		{
-			// if key already present, just return
-			if ( strcmp(key,b->key)==0 )
-				return 0;
-			else if ( b->next != NULL )
-				b = b->next;
-			else
-				break;
-		}
-		// key not found
-		b->next = malloc( sizeof(struct bucket) );
-		if ( b->next == NULL )
-		{
-			printf("failed to allocate store for hashset bucket\n");
-			exit( 0 );
-		}
-		bucket_set_key( b, key, id );
-		set->num_keys++;
-		return 1;
-	}
+    int i,j;
+    for ( j=0,i=0;i<hs->num_buckets;i++ )
+    {
+        struct hs_bucket *b = hs->buckets[i];
+        while ( b != NULL )
+        {
+            items[j++] = b->key;
+            b = b->next;
+        }
+    }
+    if ( hs->num_keys != j )
+        warning("hashset: expected %d items but found only %d\n",hs->num_keys,j);
 }
 /**
- * Get the size of this hashset
- * @param set the hashset to get the size of
- * @return the number of its current entries
+ * Does this hashset contain the given key?
+ * @param hs the hashset in question
+ * @param key the key we seek
+ * @return 1 if it was there else 0
  */
-int hashset_size( hashset *set )
+int hashset_contains( hashset *hs, UChar *key )
 {
-	return set->num_keys;
+    unsigned slot = hash(key,u_strlen(key))%hs->num_buckets;
+    struct hs_bucket *b = hs->buckets[slot];
+    while ( b != NULL )
+    {
+        if ( u_strcmp(b->key,key)==0 )
+            return 1;
+        b = b->next;
+    }
+    return 0;
 }
 /**
- * Get the keys of this hashset as an array
- * @param array an array just big enough for the keys
+ * Print a hashset for debugging to the console
+ * @param hs the hashset in question
  */
-void hashset_to_array( hashset *set, char **array )
+void hashset_print( hashset *hs )
 {
-	int i,j;
-	for ( j=0,i=0;i<set->num_buckets;i++ )
-	{
-		struct bucket *b = set->buckets[i];
-		while ( b != NULL )
-		{
-			array[j++] = b->key;
-			b = b->next;
-		}
-	}
+    int i;
+    for ( i=0;i<hs->num_buckets;i++ )
+    {
+        struct hs_bucket *b = hs->buckets[i];
+        while ( b != NULL )
+        {
+            u_printf( "%s: %d\n",b->key,b->id );
+            b = b->next;
+        }
+    }
 }
+#ifdef HASHSET_DEBUG
+int main( int argc, char **argv )
+{
+	hashset *hs = hashset_create();
+      if ( hs != NULL )
+      {
+           UChar utmp[32];
+           hashset_put( hs, str2ustr("banana",utmp,32) );
+           hashset_put( hs, str2ustr("apple",utmp,32) );
+           hashset_put( hs, str2ustr("pineapple",utmp,32) );
+           hashset_put( hs, str2ustr("guava",utmp,32) );
+           hashset_put( hs, str2ustr("watermelon",utmp,32) );
+           hashset_put( hs, str2ustr("orange",utmp,32) );
+           hashset_put( hs, str2ustr("starfruit",utmp,32) );
+           hashset_put( hs, str2ustr("durian",utmp,32) );
+           hashset_put( hs, str2ustr("cherry",utmp,32) );
+           hashset_put( hs, str2ustr("apricot",utmp,32) );
+           hashset_put( hs, str2ustr("peach",utmp,32) );
+           hashset_put( hs, str2ustr("pear",utmp,32) );
+           hashset_put( hs, str2ustr("nectarine",utmp,32) );
+           hashset_put( hs, str2ustr("plum",utmp,32) );
+           hashset_put( hs, str2ustr("grape",utmp,32) );
+           hashset_put( hs, str2ustr("mandarin",utmp,32) );
+           hashset_put( hs, str2ustr("lemon",utmp,32) );
+           hashset_put( hs, str2ustr("clementine",utmp,32) );
+           hashset_put( hs, str2ustr("cumquat",utmp,32) );
+           hashset_put( hs, str2ustr("custard apple",utmp,32) );
+           hashset_put( hs, str2ustr("asian pear",utmp,32) );
+           hashset_put( hs, str2ustr("jakfruit",utmp,32) );
+           hashset_put( hs, str2ustr("rambutan",utmp,32) );
+           hashset_put( hs, str2ustr("lime",utmp,32) );
+           hashset_put( hs, str2ustr("lychee",utmp,32) );
+           hashset_put( hs, str2ustr("mango",utmp,32) );
+           hashset_put( hs, str2ustr("mangosteen",utmp,32) );
+           hashset_put( hs, str2ustr("avocado",utmp,32) );
+           hashset_put( hs, str2ustr("grandilla",utmp,32) );
+           hashset_put( hs, str2ustr("grumichama",utmp,32) );
+           hashset_put( hs, str2ustr("breadfruit",utmp,32) );
+		// repeats
+		   hashset_put( hs, str2ustr("banana",utmp,32) );
+           hashset_put( hs, str2ustr("apple",utmp,32) );
+           hashset_put( hs, str2ustr("pineapple",utmp,32) );
+           hashset_put( hs, str2ustr("guava",utmp,32) );
+           hashset_put( hs, str2ustr("watermelon",utmp,32) );
+           hashset_print( hs );
+		printf("number of elements in set=%d\n",hashset_size(hs));
+      }
+}
+#endif

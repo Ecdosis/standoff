@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="95">
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -13,6 +13,8 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -24,18 +26,18 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e "afterdirections safeguard underfoot" "SIL Palmer Chapter 2.1.xml"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -e "afterdirections safeguard underfoot" SIL\ Palmer\ Chapter\ 2.1.xml</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" "SIL Palmer Chapter 2.1.xml"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" "SIL Palmer Chapter 6.3.xml"</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" "test.xml"</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r html.css</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r html.css -f STIL -s html</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r recipe-html.json -f STIL -s html</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -r recipe-html.json -f STIL -s html slider.html </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -r recipe-html.json -f STIL -s html slider.html</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" A89#h642</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" A89#h642d.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" il-drago-tei-base.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -l it il-drago-tei-base.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -l it -r recipe.json il-drago-tei-base.xml</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" -r recipe-html.json -f STIL -s html slider.html</runcommand>
+        <runcommand>"${OUTPUT_PATH}" -l it -r recipe.json il-drago-tei-base.xml</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

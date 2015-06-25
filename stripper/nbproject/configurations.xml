@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <itemPath>include/AESE.h</itemPath>
       <itemPath>include/STIL.h</itemPath>
       <itemPath>include/attribute.h</itemPath>
       <itemPath>../formatter/include/STIL/cJSON.h</itemPath>
       <itemPath>include/calliope_AeseStripper.h</itemPath>
       <itemPath>include/dest_file.h</itemPath>
+      <itemPath>include/encoding.h</itemPath>
       <itemPath>include/error.h</itemPath>
       <itemPath>include/format.h</itemPath>
       <itemPath>include/hashmap.h</itemPath>
@@ -33,11 +33,11 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <itemPath>src/AESE.c</itemPath>
       <itemPath>src/STIL.c</itemPath>
       <itemPath>src/attribute.c</itemPath>
       <itemPath>../formatter/src/STIL/cJSON.c</itemPath>
       <itemPath>src/dest_file.c</itemPath>
+      <itemPath>src/encoding.c</itemPath>
       <itemPath>src/error.c</itemPath>
       <itemPath>src/hashmap.c</itemPath>
       <itemPath>src/hashset.c</itemPath>
@@ -79,13 +79,12 @@
         <cTool>
           <incDir>
             <pElem>include</pElem>
-            <pElem>../formatter/include/STIL</pElem>
             <pElem>../formatter/include</pElem>
             <pElem>/usr/lib/jvm/java-7-openjdk-amd64/include</pElem>
+            <pElem>/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/linux</pElem>
           </incDir>
           <preprocessorList>
             <Elem>COMMANDLINE</Elem>
-            <Elem>MEMWATCH</Elem>
           </preprocessorList>
         </cTool>
         <linkerTool>
@@ -94,6 +93,8 @@
             <linkerLibLibItem>expat</linkerLibLibItem>
             <linkerLibStdlibItem>Mathematics</linkerLibStdlibItem>
             <linkerLibLibItem>tidy</linkerLibLibItem>
+            <linkerLibFileItem>/usr/lib/x86_64-linux-gnu/libicuio.so</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/x86_64-linux-gnu/libicuuc.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
@@ -103,8 +104,6 @@
       </item>
       <item path="../formatter/src/memwatch.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="include/AESE.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
@@ -112,6 +111,8 @@
       <item path="include/calliope_AeseStripper.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/dest_file.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/encoding.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/error.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -143,13 +144,13 @@
       </item>
       <item path="include/utils.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/AESE.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/attribute.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dest_file.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/encoding.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/error.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -208,8 +209,6 @@
       </item>
       <item path="../formatter/src/memwatch.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="include/AESE.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
@@ -217,6 +216,8 @@
       <item path="include/calliope_AeseStripper.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/dest_file.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/encoding.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/error.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -248,13 +249,13 @@
       </item>
       <item path="include/utils.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="src/AESE.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/attribute.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dest_file.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/encoding.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/error.c" ex="false" tool="0" flavor2="0">
       </item>

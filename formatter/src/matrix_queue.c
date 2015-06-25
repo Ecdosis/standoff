@@ -17,18 +17,17 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "hashmap.h"
 #include "attribute.h"
 #include "annotation.h"
 #include "range.h"
 #include "range_array.h"
 #include "hashset.h"
-#include "master.h"
-#include "node.h"
-#include "text_buf.h"
-#include "output.h"
 #include "matrix.h"
 #include "matrix_queue.h"
+#include "HTML.h"
 #include "error.h"
 #include "memwatch.h"
 struct matrix_queue_struct

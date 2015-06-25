@@ -23,6 +23,9 @@
 #include <errno.h>
 #include <limits.h>
 #include <stdarg.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #include "hashmap.h"
 #include "attribute.h"
 #include "annotation.h"
@@ -31,8 +34,6 @@
 #include "text_buf.h"
 #include "range_array.h"
 #include "hashset.h"
-#include "master.h"
-#include "output.h"
 #include "matrix.h"
 #include "dom.h"
 #include "queue.h"
@@ -40,12 +41,13 @@
 #include "css_selector.h"
 #include "css_rule.h"
 #include "error.h"
-#include "output.h"
+#include "HTML.h"
+#include "utils.h"
 #include "memwatch.h"
 
 #define BUFLEN 1024
 #define TEXT_BUF_SIZE 10000
-
+static UChar U_ID[] = {'i','d'};
 /**
  * Represent a document object model to test the dom-building algorithm 
  */
@@ -53,8 +55,10 @@
 struct dom_struct
 {
     queue *q;
-    output *out;
+    text_buf *buf;
     matrix *pm;
+    int text_len;
+    const UChar *text;
     /** copy of css ranges used to build matrix */
     range_array *ranges;
     /** css rules indexed by class name */
@@ -66,7 +70,7 @@ static void dom_range_inside_node( dom *d, node *n, node *r );
 
 /**
  * Convert a raw array of properties to a real array of interleaved property 
- * names and their output equivalents. Only include those that are mentioned 
+ * names and their HTML equivalents. Only include those that are mentioned 
  * in the CSS file.
  * @param p_size VAR param the size of the property list (adjust)
  * @param array the raw array of property names
@@ -75,8 +79,8 @@ static void dom_range_inside_node( dom *d, node *n, node *r );
  * must dispose!
  * @return 1 if it worked, else 0
  */
-static int array_to_props( int *p_size, char **array, hashmap *rules, 
-    char ***props )
+static int array_to_props( int *p_size, UChar **array, hashmap *rules, 
+    UChar ***props )
 {
     int i,j;
     int required = 0;
@@ -86,7 +90,7 @@ static int array_to_props( int *p_size, char **array, hashmap *rules,
         if ( hashmap_contains(rules,array[i]) )
             required += 2;
     }
-    *props = calloc( required+1, sizeof(char*) );
+    *props = calloc( required+1, sizeof(UChar*) );
     if ( *props != NULL )
     {
         for ( j=0,i=0;i<*p_size;i++ )
@@ -140,14 +144,14 @@ static int dom_filter_ranges( dom *d, range_array *ranges )
                 for ( i=1;i<num_ranges;i++ )
                 {
                     range *r = range_array_get( ranges, i );
-                    char *r_name = range_name( r );
+                    UChar *r_name = range_name( r );
                     hashset *pruned = matrix_get_lookup(d->pm);
                     if ( hashset_contains(pruned,r_name) )
                     {
                         css_rule *rule = hashmap_get( d->css_rules,r_name );
-                        char *tag_name = css_rule_get_element(rule);
-                        if ( range_tag_name(r) != NULL||
-                            range_set_tag_name(r,tag_name) )
+                        UChar *html_name = css_rule_get_element(rule);
+                        if ( range_html_name(r) != NULL||
+                            range_set_html_name(r,html_name) )
                         {
                             // this should duplicate the range
                             range *r_dup = range_copy( r );
@@ -159,7 +163,7 @@ static int dom_filter_ranges( dom *d, range_array *ranges )
                         }
                         else
                         {
-                            warning("dom: couldn't set tag name for %s\n", 
+                            warning("dom: couldn't set html name for %s\n", 
                                 r_name);
                             return 0;
                         }
@@ -180,9 +184,9 @@ static int dom_filter_ranges( dom *d, range_array *ranges )
  */
 static node *dom_range_to_node( dom *d, range *r )
 {
-    char *tag_name = range_tag_name(r);
-    node *n = node_create( range_name(r),range_tag_name(r),range_start(r),
-        range_len(r), (tag_name==NULL)?0:output_is_empty(d->out,tag_name), 
+    UChar *html_name = range_html_name(r);
+    node *n = node_create( range_name(r),range_html_name(r),range_start(r),
+        range_len(r), (html_name==NULL)?0:html_is_empty(html_name), 
         range_get_rightmost(r) );
     if ( n != NULL )
     {
@@ -206,86 +210,87 @@ static node *dom_range_to_node( dom *d, range *r )
  * @param ranges an array of ranges read from the markup file(s)
  * @param rules a read-only hashmap of css_rules indexed by property name
  * @param properties the set of property names we are interested in
- * @param output_format the format of the outputted data
  * @return the constructed dom
  */
-dom *dom_create( const char *text, int len, range_array *ranges,  
-    hashmap *rules, hashset *properties, output_fmt_type output_format )
+dom *dom_create( const UChar *text, int len, range_array *ranges,  
+    hashmap *rules, hashset *properties )
 {
     dom *d = calloc( 1, sizeof(dom));
     if ( d != NULL )
     {
         int p_size;
-        char **array;
+        UChar **array;
+        d->text = text;
+        d->text_len = len;
         d->css_rules = rules;
-        d->out = output_create( output_format, text, len );
-        if ( d->out != NULL )
+        p_size = hashset_size(properties);
+        if ( p_size > 0 )
         {
-            p_size = hashset_size(properties);
-            if ( p_size > 0 )
+            UChar **props;
+            array = calloc( p_size, sizeof(UChar*) );
+            if ( array == NULL )
             {
-                char **props;
-                array = calloc( p_size, sizeof(char*) );
-                if ( array == NULL )
+                warning("dom: failed to allocate properties array\n");
+                dom_dispose( d );
+                return NULL;
+            }
+            hashset_to_array( properties, array );
+            if ( array_to_props(&p_size,array,rules,&props) )
+            {
+                free( array );
+                array = NULL;
+                d->pm = matrix_create( p_size, props );
+                free( props );
+                props = NULL;
+                if ( d->pm == NULL )
                 {
-                    warning("dom: failed to allocate properties array\n");
+                    warning("dom: failed to create property matrix\n");
                     dom_dispose( d );
                     return NULL;
                 }
-                hashset_to_array( properties, array );
-                if ( array_to_props(&p_size,array,rules,&props) )
+                if ( range_array_size(ranges) > 0 )
                 {
-                    free( array );
-                    array = NULL;
-                    d->pm = matrix_create( p_size, props );
-                    free( props );
-                    props = NULL;
-                    if ( d->pm == NULL )
+                    d->q = queue_create();
+                    if ( d->q == NULL || !dom_filter_ranges(d,ranges) )
                     {
-                        warning("dom: failed to create property matrix\n");
                         dom_dispose( d );
                         return NULL;
                     }
-                    if ( range_array_size(ranges) > 0 )
+                    else
                     {
-                        d->q = queue_create();
-                        if ( d->q == NULL || !dom_filter_ranges(d,ranges) )
-                        {
-                            dom_dispose( d );
-                            return NULL;
-                        }
-                        else
-                        {
-                            range *r = queue_pop( d->q );
-                            d->root = dom_range_to_node( d, r );
-                        }
-                        range_array_sort( d->ranges );
-                        matrix_init( d->pm, d->ranges );
-                        matrix_update_nesting( d->pm, d->out );
+                        range *r = queue_pop( d->q );
+                        d->root = dom_range_to_node( d, r );
+                    }
+                    d->buf = text_buf_create( (len*150)/100 );
+                    if ( d->buf == NULL )
+                    {
+                        dom_dispose( d );
+                        d = NULL;
                     }
                     else
                     {
-                        warning("dom: property list empty\n");
-                        dom_dispose( d );
-                        d = NULL;
+                        range_array_sort( d->ranges );
+                        matrix_init( d->pm, d->ranges );
+                        matrix_update_html( d->pm );
                     }
                 }
                 else
                 {
-                    warning("dom: failed to build property array\n");
+                    warning("dom: property list empty\n");
                     dom_dispose( d );
                     d = NULL;
                 }
             }
             else
             {
-                warning("dom: no properties specified. aborting.\n");
+                warning("dom: failed to build property array\n");
                 dom_dispose( d );
                 d = NULL;
             }
         }
         else
         {
+            warning("dom: no properties specified. aborting.\n");
             dom_dispose( d );
             d = NULL;
         }
@@ -318,17 +323,16 @@ void dom_dispose( dom *d )
         dom_dispose_node( d->root );
     if ( d->pm != NULL )
         matrix_dispose( d->pm );
+    if ( d->buf != NULL  )
+        text_buf_dispose( d->buf );
     if ( d->q != NULL )
         queue_dispose( d->q );
-    if ( d->out != NULL )
-        output_dispose( d->out );
     // rules are read-only from formatter
     free( d );
 }
 /**
  * Build the dom
  * @param d the dom object to build
- * @return 1 on success
  */
 int dom_build( dom *d )
 {
@@ -339,19 +343,100 @@ int dom_build( dom *d )
         node *r = dom_range_to_node( d, rx );
         if ( r != NULL )
         {
-            int text_len = output_text_len(d->out);
-            if ( node_end(r) > text_len )
+            if ( node_end(r) <= d->text_len )
+                dom_add_node( d, d->root, r );
+            else
             {
-                fprintf(stderr,
-                        "node range %d:%d > text length (%d)... shortening.\n",
-                    node_offset(r),node_end(r), text_len );
-                node_set_end(r,text_len);
+                fprintf(stderr,"node range %d:%d > text length (%d)\n",
+                    node_offset(r),node_end(r), d->text_len );
+                node_dispose( r );
+                res = 0;
+                break;
             }
-            dom_add_node( d, d->root, r );
         }
     }
     //matrix_dump( d->pm );
     return res;
+}
+/**
+ * Concatenate a formatted string onto the buffer for printing
+ * @param d the dom in question
+ * @param format the format of the data
+ * @param len the number of bytes to copy
+ */
+ 
+static void dom_concat( dom *d, const char *format, int len, ... )
+{
+    UChar temp[128];
+    va_list args;
+    va_start( args, len );
+    int res = u_vsnprintf( temp, 128, format, args );
+    if ( res == len )
+        text_buf_concat( d->buf, temp, len );
+    else
+        warning("dom: failed to print %d bytes to output\n",len);
+    va_end( args );
+}
+/**
+ * Add some text to the buffer
+ * @param d the dom whose buffer will be extended
+ * @param offset the offset to start printing at
+ * @param len the length of the text to print
+ */
+static void dom_print_text( dom *d, int offset, int len )
+{
+    UChar *copy = calloc(len+1,sizeof(UChar));
+    if ( copy != NULL )
+    {
+        u_strncpy( copy, &d->text[offset], len );
+        copy[len] = 0;
+        text_buf_concat( d->buf, copy, len );
+        free( copy );
+    }
+    else
+        warning("dom: failed to allocate string for printing\n");
+}
+/**
+ * Print a single node and its children, siblings
+ * @param d the dom in question
+ * @param n the node to print
+ */
+static void dom_print_node( dom *d, node *n )
+{
+	node *c;
+    int start,end;
+    UChar *html_name = node_html_name(n);
+    UChar *class_name = node_name(n);
+    UChar attrs[128];
+    node_get_attributes( n, attrs, 128 );
+    if ( !node_empty(n) )
+    {
+        if ( !node_is_root(n) )
+            dom_concat( d, "<%S%S class=\"%S\">", u_strlen(html_name)
+                +u_strlen(class_name)+u_strlen(attrs)+11, html_name, 
+                attrs, class_name );
+    }
+    c = node_first_child(n);
+    start = node_offset(n);
+    end = node_end(n);
+    while ( c != NULL )
+    {
+        int pos = node_offset( c );
+        if ( pos > start )
+            dom_print_text( d, start, pos-start );
+        dom_print_node( d, c );
+        start = node_end( c );
+        c = node_next_sibling( c );
+    }
+    if ( end > start )
+        dom_print_text( d, start, end-start );
+    if ( !node_is_root(n) )
+    {
+        if ( !node_empty(n) )
+            dom_concat(d, "</%S>",u_strlen(html_name)+3, html_name);
+        else if ( node_rightmost(n) )
+            dom_concat(d,"<%S>",u_strlen(html_name)+2,html_name);
+    }
 }
 /**
  * Print the entire tree
@@ -359,7 +444,7 @@ int dom_build( dom *d )
  */
 void dom_print( dom *d )
 {
-    output_print_node( d->out, d->root );
+    dom_print_node( d, d->root );
 }
 /**
  * Does the range (now a node) properly contain the node?
@@ -398,7 +483,7 @@ static int node_encloses_range( node *n, node *r )
  * @param r_name the outside property name
  * @return 1 if it's true else 0
  */
-static int dom_mostly_nests( dom *d, char *n_name, char *r_name )
+static int dom_mostly_nests( dom *d, UChar *n_name, UChar *r_name )
 {
     int nInR = matrix_inside( d->pm, n_name, r_name );
     int rInN = matrix_inside( d->pm, r_name, n_name );
@@ -411,7 +496,7 @@ static int dom_mostly_nests( dom *d, char *n_name, char *r_name )
  * @param name2 the second property name
  * @return 1 if nesting of name1 inside name2 is possible, else 0
  */
-static int dom_nests( dom *d, char *name1, char *name2 )
+static int dom_nests( dom *d, UChar *name1, UChar *name2 )
 {
     return matrix_inside( d->pm, name1, name2 ) > 0;
 }
@@ -509,15 +594,15 @@ static void dom_make_parent( dom *d, node *n, node *r )
  */
 static void dom_drop_notify( dom *d, node *r, node *n )
 {
-    warning("dom: dropping %s at %d:%d - %s and %s incompatible\n",
+    u_printf("dom: dropping %S at %d:%d - %S and %S incompatible\n",
         node_name(r),node_offset(r),
-        node_end(r),node_output_name(r),node_output_name(n));
-    attribute *id = node_get_attribute( r, "id" );
+        node_end(r),node_html_name(r),node_html_name(n));
+    attribute *id = node_get_attribute( r, U_ID );
     if ( id != NULL )
     {
-        char *value = attribute_get_value( id );
-        if ( value[strlen(value)-1]=='b' )
-            printf( "aha! dropping id %s\n",value );
+        UChar *value = attribute_get_value( id );
+        if ( value[u_strlen(value)-1]==(UChar)'b' )
+            u_printf( "aha! dropping id %S\n",value );
     }
     node_dispose( r );
 }
@@ -742,10 +827,8 @@ static void dom_add_node( dom *d, node *n, node *r )
  */
 void dom_check_output( dom *d )
 {
-    text_buf *buf = output_text_buf(d->out);
-    int len = text_buf_len( buf );
-    const char *text = output_text_source( d->out );
-    char *output = text_buf_get_buf( buf );
+    int len = text_buf_len( d->buf );
+    UChar *output = text_buf_get_buf( d->buf );
     int i,state = 0;
     int pos = 0;
     for ( i=0;i<len;i++ )
@@ -755,8 +838,7 @@ void dom_check_output( dom *d )
             case 0: // reading text
                 if ( output[i] == '<' )
                     state = 1;
-                else if ( pos >= output_text_len(d->out) 
-                    || output[i] != text[pos] )
+                else if ( pos >= d->text_len || output[i] != d->text[pos] )
                 {
                     state = -1;
                     warning("mismatch at character %d\n",pos);
@@ -765,7 +847,7 @@ void dom_check_output( dom *d )
                     pos++;
                 break;
             case 1: // reading tag
-                if ( output[i] == '>' )
+                if ( output[i] == (UChar)'>' )
                     state = 0;
                 break;
         }
@@ -780,7 +862,7 @@ void dom_check_output( dom *d )
  */
 text_buf *dom_get_text_buf( dom *d )
 {
-    return output_text_buf(d->out);
+    return d->buf;
 }
 /**
  * Check a single tree-node, recursively
@@ -803,7 +885,7 @@ static int dom_check_node( node *n )
         }
         else if ( node_end(c)>end )
         {
-            warning("dom: invalid end %d (%s) > parent end %d (%s)\n",
+            u_printf("dom: invalid end %d (%S) > parent end %d (%S)\n",
                 node_end(c), node_name(c), end, node_name(n) );
             return 0;
         }

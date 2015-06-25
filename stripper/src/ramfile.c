@@ -2,16 +2,20 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #include "ramfile.h"
 #include "error.h"
+#include "utils.h"
 #include "memwatch.h"
 #define BLOCK_SIZE 8096
 #define PRINT_LIMIT 32024
-static char buf[PRINT_LIMIT];
+static UChar buf[PRINT_LIMIT];
 struct ramfile_struct
 {
     int allocated;
-    char *buf;
+    UChar *buf;
     char *name;
     int used;
 };
@@ -25,7 +29,7 @@ ramfile *ramfile_create( const char *name )
     ramfile *rf = calloc( 1, sizeof(ramfile) );
     if ( rf != NULL )
     {
-        rf->buf = malloc( BLOCK_SIZE );
+        rf->buf = calloc( BLOCK_SIZE, sizeof(UChar) );
         if ( rf->buf == NULL )
         {
             free( rf );
@@ -38,7 +42,7 @@ ramfile *ramfile_create( const char *name )
             rf->used = 0;
             if ( hyphen_pos != NULL && strlen(hyphen_pos+1) > 0 )
                 name = hyphen_pos+1;
-            rf->name = strdup(name);
+            rf->name = strdup((char*)name);
         }
     }
 	return rf;
@@ -61,12 +65,12 @@ void ramfile_dispose( ramfile *rf )
  * @param len the length of the data 
  * @return nchars if it worked, else 0
  */
-int ramfile_write( ramfile *rf, const char *data, int len )
+int ramfile_write( ramfile *rf, const UChar *data, int len )
 {
     if ( len+rf->used >= rf->allocated )
     {
-        int new_size = len+rf->used+BLOCK_SIZE ;
-        char *tmp = malloc( new_size );
+        int new_size = len+rf->used+BLOCK_SIZE;
+        UChar *tmp = calloc( new_size, sizeof(UChar) );
         if ( tmp != NULL )
         {
             memcpy( tmp, rf->buf, rf->used );
@@ -98,8 +102,8 @@ int ramfile_print( ramfile *rf, const char *fmt, ... )
     int slen,res = 1;
     va_list ap;
     va_start( ap, fmt );
-    vsnprintf( buf, PRINT_LIMIT, fmt, ap );
-    slen = strlen(buf);
+    u_vsnprintf( buf, PRINT_LIMIT, fmt, ap );
+    slen = u_strlen(buf);
     res = ramfile_write( rf, buf, slen );
     va_end( ap );
     return res;
@@ -109,7 +113,7 @@ int ramfile_print( ramfile *rf, const char *fmt, ... )
  * @param rf the ramfile in question
  * @return a C-string
  */
-char *ramfile_get_buf( ramfile *rf )
+UChar *ramfile_get_buf( ramfile *rf )
 {
     return rf->buf;
 }

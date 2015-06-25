@@ -23,7 +23,8 @@ if [ $USER = "root" ]; then
   fi
   JDKINC=`getjdkinclude`
   JDKINCMD="$JDKINC/linux"
-  gcc -c -DHAVE_EXPAT_CONFIG_H -DHAVE_MEMMOVE -DJNI -I$JDKINC -I$JDKINCMD -Iinclude -I../formatter/include -I../formatter/include/STIL -O0 -Wall -g3 -fPIC ../formatter/src/STIL/cJSON.c src/*.c  
+  gcc -c -DHAVE_EXPAT_CONFIG_H -DHAVE_MEMMOVE -DJNI -I$JDKINC -I$JDKINCMD -Iinclude -O0 -Wall -g3 -fPIC \
+    src/*.c  
   gcc *.o -shared -lexpat -laspell -ltidy -o libAeseStripper.$LIBSUFFIX
   cp libAeseStripper.$LIBSUFFIX /usr/local/lib
 else

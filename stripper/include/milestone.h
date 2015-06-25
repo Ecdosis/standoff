@@ -12,11 +12,11 @@
 extern "C" {
 #endif
 typedef struct milestone_struct milestone;
-milestone *milestone_create( char *name );
+milestone *milestone_create( UChar *name );
 milestone *milestone_dispose( milestone *m );
 void milestone_append( milestone *parent, milestone *child );
-int milestone_contains( milestone *head, char *name );
-char *milestone_name( milestone *m );
+int milestone_contains( milestone *head, UChar *name );
+UChar *milestone_name( milestone *m );
 milestone *milestone_next( milestone *m );
 
 #ifdef	__cplusplus

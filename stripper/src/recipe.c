@@ -29,7 +29,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include "expat.h"
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "attribute.h"
 #include "simplification.h"
 #include "milestone.h"
@@ -37,20 +38,13 @@
 #include "recipe.h"
 #include "error.h"
 #include "cJSON.h"
+#include "utils.h"
+#include "encoding.h"
 #include "memwatch.h"
-#ifdef XML_LARGE_SIZE
-#if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
-#define XML_FMT_INT_MOD "I64"
-#else
-#define XML_FMT_INT_MOD "ll"
-#endif
-#else
-#define XML_FMT_INT_MOD "l"
-#endif
 struct recipe_struct
 {
     // list of removals
-    char **removals;
+    UChar **removals;
     // list of simplifications
     simplification **rules;
     /** list of extra layers */
@@ -69,7 +63,7 @@ recipe *recipe_new()
         r->rules = calloc(1,sizeof(simplification*));
         if ( r->rules != NULL )
         {   
-            r->removals = calloc( 1, sizeof(char*) );
+            r->removals = calloc( 1, sizeof(UChar*) );
             if ( r->removals == NULL )
             {
                 r = recipe_dispose(r);
@@ -92,8 +86,8 @@ recipe *recipe_new()
  * @param name the name of the attribute
  * @param value its value
  */
-static void recipe_add_attribute( simplification *s, const char *name,
-    const char *value )
+static void recipe_add_attribute( simplification *s, const UChar *name,
+    const UChar *value )
 {
     attr1bute *a = attribute_new( name, value );
     simplification_add_attribute( s, a );
@@ -152,15 +146,15 @@ static int recipe_add_layer( recipe *r, layer *l )
  * Add a basic rule
  * @param r the recipe to add it to
  * @param xml_name the name of the xml element
- * @param aese_name the name of the aese property
+ * @param prop_name the name of the aese property
  * @return the rule added
  */
 static simplification *recipe_add_rule( recipe *r,
-    const char *xml_name, const char *aese_name )
+    UChar *xml_name, UChar *prop_name )
 {
     int i;
     simplification **rules;
-    simplification *s = simplification_new( xml_name, aese_name );
+    simplification *s = simplification_new( xml_name, prop_name );
     int n_rules = count_rules( r->rules );
     rules = malloc( (n_rules+2)*sizeof(simplification*) );
     if ( rules == NULL )
@@ -178,7 +172,7 @@ static simplification *recipe_add_rule( recipe *r,
  * @param removals a NULL-terminated array of string pointers
  * @return the number of removals
  */
-static int count_removals( char **removals )
+static int count_removals( UChar **removals )
 {
     int i = 0;
     while ( removals[i] != NULL )
@@ -190,15 +184,15 @@ static int count_removals( char **removals )
  * @param r the recipe to add it to
  * @param removal name of an element to remove (and all its descendants)
  */
-static void recipe_add_removal( recipe *r, const char *removal )
+static void recipe_add_removal( recipe *r, UChar *removal )
 {
     int i;
-    char **removals;
-    char *rm = strdup( removal );
+    UChar **removals;
+    UChar *rm = u_strdup( removal );
     if ( rm == NULL )
         error( "recipe: failed to allocate for removal\n" );
     int n_removals = count_removals( r->removals );
-    removals = malloc( sizeof(char*)*(n_removals+2) );
+    removals = calloc( n_removals+2,sizeof(UChar*) );
     if ( removals == NULL )
         error( "recipe: failed to reallocate removals\n");
     // copy old removals to new removals
@@ -208,105 +202,6 @@ static void recipe_add_removal( recipe *r, const char *removal )
     removals[i] = rm;
     free( r->removals );
     r->removals = removals;
-}
-/**
- * Get an attribute from those available
- * @param name the name of the attribute
- * @param atts the expat attribute array
- * @return the attribute's value or NULL if not found
- */
-static const char *get_attr( const char *name, const char **atts )
-{
-    int i = 0;
-    while ( atts[i] != NULL )
-    {
-        if ( strcmp(atts[i],name)==0 )
-            return atts[i+1];
-        i += 2;
-    }
-    return NULL;
-}
-/**
- * Start element handler for XML file stripping. 
- * @param userData the user data (optional)
- * @param name the name of the element
- * @param atts an array of attributes terminated by a NULL
- * pointer
- */
-static void XMLCALL start_recipe_element( void *userData,
-	const char *name, const char **atts )
-{
-    recipe *r = (recipe*)userData;
-    if ( strcmp(name,"rule")==0 )
-    {
-        const char *prop_name = get_attr( "prop_name", atts );
-        const char *xml_name = get_attr( "xml_name", atts );
-        if ( prop_name == NULL || xml_name == NULL )
-        {
-            warning( "recipe: missing attribute prop_name or "
-                "xml_name for rule\n" );
-            current_rule = NULL;
-        }
-        else
-            current_rule = recipe_add_rule( r, xml_name, prop_name );
-    }
-    else if ( strcmp(name,"removal")==0 )
-    {
-        const char *rem_name = get_attr( "name", atts );
-        if ( rem_name == NULL )
-            warning( "recipe: missing removal name\n");
-        else
-            recipe_add_removal( r, rem_name );
-    }
-    else if ( strcmp(name,"attribute")==0 )
-    {
-        const char *attr_name = get_attr( "name", atts );
-        const char *attr_value = get_attr( "value", atts );
-        if ( attr_name == NULL || attr_value == NULL )
-            warning( "recipe: missing attribute name or value\n");
-        else if ( current_rule != NULL )
-            recipe_add_attribute( current_rule, attr_name, attr_value );
-    }
-}
-/**
- * End element handler for XML split
- * @param userData (optional)
- * @param name name of element
- */
-static void XMLCALL end_recipe_element(void *userData,
-	const char *name )
-{
-    if ( strcmp(name,"rule")==0 )
-        current_rule = NULL;
-}
-/**
- * Load a recipe from its xml file
- * @param r the recipe object
- * @param buf the XML recipe file
- * @param len its length
- * @return a loaded recipe
- */
-static recipe *recipe_load_xml( const char *buf, int len )
-{
-	recipe *r = recipe_new();
-	XML_Parser lparser = XML_ParserCreate( NULL );
-	if ( lparser == NULL )
-        error("recipe: failed to create parser\n");
-    else
-    {
-        XML_SetElementHandler( lparser, start_recipe_element,
-            end_recipe_element );
-        XML_SetUserData( lparser, r );
-        if ( XML_Parse(lparser,buf,len,1) == XML_STATUS_ERROR )
-        {
-            printf(
-                "%s at line %" XML_FMT_INT_MOD "u\n",
-                XML_ErrorString(XML_GetErrorCode(lparser)),
-                XML_GetCurrentLineNumber(lparser));
-        }
-        XML_ParserFree( lparser );
-    }
-    return r;
 }
 /**
  * Parse simplification rules
@@ -353,11 +248,26 @@ static void recipe_parse_rules( recipe *r, cJSON *item )
         }
         else
         {
-            current_rule = recipe_add_rule( r, xml_name, prop_name );
+            UChar *u_xml_name = utf8toutf16((char*)xml_name);
+            UChar *u_prop_name = utf8toutf16((char*)prop_name);
+            if ( u_xml_name != NULL && u_prop_name != NULL )
+                current_rule = recipe_add_rule( r, u_xml_name, u_prop_name );
             if ( current_rule != NULL && attr_name != NULL 
                 && attr_value != NULL )
-                recipe_add_attribute( current_rule, attr_name, 
-                    attr_value );
+            {
+                UChar *u_attr_name = utf8toutf16((char*)attr_name);
+                UChar *u_attr_value = utf8toutf16((char*)attr_value);
+                if ( u_attr_name != NULL && u_attr_value != NULL )
+                    recipe_add_attribute( current_rule, u_attr_name, u_attr_value );
+                if ( u_attr_name != NULL )
+                    free( u_attr_name );
+                if ( u_attr_value != NULL )
+                    free( u_attr_value );
+            }
+            if ( u_xml_name != NULL )
+                free( u_xml_name );
+            if ( u_prop_name != NULL )
+                free( u_prop_name );
         }
         obj = obj->next;
     }
@@ -378,15 +288,22 @@ static milestone *parse_milestone_set( cJSON *item )
         {
             if ( strcmp(field->string,"xml_name")==0 )
             {
-                milestone *m = milestone_create(field->valuestring);
-                if ( m != NULL )
+                UChar *u_valuestring = utf8toutf16(field->valuestring);
+                if ( u_valuestring != NULL )
                 {
-                    if ( list == NULL )
-                        list = m;
-                    else
-                        milestone_append(list,m);
+                    milestone *m = milestone_create(u_valuestring);
+                    free( u_valuestring );
+                    if ( m != NULL )
+                    {
+                        if ( list == NULL )
+                            list = m;
+                        else
+                            milestone_append(list,m);
+                    }
+                    else    // error reported in milestone
+                        break;
                 }
-                else    // error reported in milestone
+                else
                     break;
             }
             field = field->next;
@@ -419,13 +336,20 @@ static void recipe_parse_layers( recipe *r, cJSON *item )
         // now build the layer
         if ( name != NULL && milestones != NULL )
         {
-            layer *l = layer_create( name, milestones );
-            if ( l != NULL )
+            UChar *u_name = utf8toutf16(name);
+            if ( u_name != NULL )
             {
-                if ( !recipe_add_layer(r,l) )
+                layer *l = layer_create( u_name, milestones );
+                free( u_name );
+                if ( l != NULL )
+                {
+                    if ( !recipe_add_layer(r,l) )
+                        break;
+                    milestones = NULL;
+                    name = NULL;
+                }
+                else
                     break;
-                milestones = NULL;
-                name = NULL;
             }
             else
                 break;
@@ -463,7 +387,14 @@ static void recipe_parse_json( recipe *r, cJSON *root )
             while ( child != NULL )
             {
                 if ( child->valuestring != NULL )
-                    recipe_add_removal( r, child->valuestring );
+                {
+                    UChar *u_valuestring = utf8toutf16(child->valuestring);
+                    if ( u_valuestring != NULL )
+                    {
+                        recipe_add_removal( r, u_valuestring );
+                        free( u_valuestring);
+                    }
+                }
                 child = child->next;
             }
         }
@@ -522,9 +453,7 @@ static int begins_with( const char *buf, char first )
  */
 recipe *recipe_load( const char *buf, int len )
 {
-    if ( begins_with(buf,'<') )
-        return recipe_load_xml( buf, len );
-    else if ( begins_with(buf,'{') )
+    if ( begins_with(buf,'{') )
         return recipe_load_json( buf );
     else
     {
@@ -540,10 +469,9 @@ recipe *recipe_load( const char *buf, int len )
  * @param attrs copy of its attributes (will be modified!)
  * @return the name of the Aese property
  */
-char *recipe_simplify( recipe *r, char *name, char **attrs )
+UChar *recipe_simplify( recipe *r, UChar *name, UChar **attrs )
 {
-    simplification *s = recipe_has_rule( r, (const char*)name,
-        (const char**)attrs );
+    simplification *s = recipe_has_rule( r, name, attrs );
     if ( s != NULL )
     {
         simplification_remove_attribute( s, attrs );
@@ -558,14 +486,14 @@ char *recipe_simplify( recipe *r, char *name, char **attrs )
  * @param attrs its attributes from expat
  * @return pointer to the rule for this element, else NULL
  */
-simplification *recipe_has_rule( recipe *r, const char *name,
-    const char **attrs )
+simplification *recipe_has_rule( recipe *r, UChar *name,
+    UChar **attrs )
 {
     int i=0;
     while ( r->rules[i] != NULL )
     {
-        if ( strcmp(simplification_get_xml_name(r->rules[i]),name)==0
-            && simplification_contains(r->rules[i],(char**)attrs) )
+        if ( u_strcmp(simplification_get_xml_name(r->rules[i]),name)==0
+            && simplification_contains(r->rules[i],attrs) )
             return r->rules[i];
         i++;
     }
@@ -634,12 +562,12 @@ recipe *recipe_dispose( recipe *r )
  * @param removal the name of the element that may be removed
  * @return 1 if it is slated for removal, 0 otherwise
  */
-int recipe_has_removal( recipe *r, const char *removal )
+int recipe_has_removal( recipe *r, UChar *removal )
 {
     int i = 0;
     while ( r->removals[i] != NULL )
     {
-        if ( strcmp(removal,r->removals[i++])==0 )
+        if ( u_strcmp(removal,r->removals[i++])==0 )
             return 1;
     }
     return 0;

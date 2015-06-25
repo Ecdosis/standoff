@@ -22,30 +22,16 @@
 
 #ifndef FORMAT_H_
 #define FORMAT_H_
-#ifdef JNI
-#define DST_FILE ramfile
-#define DST_WRITE(p,n,f) ramfile_write( f, p, n )
-#define DST_PRINT(s,f,...) ramfile_print( s, f, __VA_ARGS__ )
-#else
-#define DST_FILE FILE
-#define DST_WRITE(p,n,f) fwrite( p, 1, n, f )
-#define DST_PRINT(s,f,...) fprintf( s, f, __VA_ARGS__ )
-#endif
-typedef int (*format_write_header)(void *arg, DST_FILE *dst, 
-        const char *format );
-typedef int (*format_write_tail)(void *arg, DST_FILE *dst);
-typedef int (*format_write_range)( char *name, char **atts, int removed,
-	int offset, int len, char *content, int content_len, int final, 
-    DST_FILE *dst );
-/* this has to be public so we can initialise it in main */
-typedef struct
-{
-	const char *name;
-	format_write_header hfunc;
-	format_write_tail tfunc;
-	format_write_range rfunc;
-	const char *text_suffix;
-	const char *markup_suffix;
-	const char *middle_name;
-} format;
+typedef struct format_struct format;
+typedef int (*format_write_header)(void *arg, dest_file *dst, UChar *format );
+typedef int (*format_write_tail)(void *arg, dest_file *dst);
+typedef int (*format_write_range)( UChar *name, UChar **atts, int removed,
+	int offset, int len, UChar *content, int content_len, int final, 
+    dest_file *dst );
+format_write_range format_rfunc(format *f);
+format_write_tail format_tfunc(format *f);
+format_write_header format_hfunc(format *f);
+const char *format_text_suffix(format *f);
+const char *format_markup_suffix(format *f);
+const char *format_middle_name(format *f);
 #endif /* FORMAT_H_ */

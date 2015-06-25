@@ -26,31 +26,33 @@
 #include <syslog.h>
 #include <tidy/tidy.h>
 #include <tidy/buffio.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #ifdef JNI
 #include <jni.h>
 #include "calliope_AeseStripper.h"
 #include "ramfile.h"
-#else
-#include "utils.h"
 #endif
+#include "milestone.h"
+#include "layer.h"
+#include "range.h"
+#include "dest_file.h"
 #include "format.h"
 #include "expat.h"
 #include "stack.h"
-#include "AESE.h"
 #include "STIL.h"
 #include "hashset.h"
 #include "error.h"
-#include "range.h"
 #include "attribute.h"
 #include "simplification.h"
-#include "milestone.h"
-#include "layer.h"
 #include "recipe.h"
-#include "dest_file.h"
 #include "hashmap.h"
 #include "log.h"
 #include "hh_exceptions.h"
 #include "userdata.h"
+#include "utils.h"
+#include "encoding.h"
 #include "memwatch.h"
 
 #define FILE_NAME_LEN 128
@@ -63,13 +65,21 @@
 #else
 #define XML_FMT_INT_MOD "l"
 #endif
-/** array of available formats - add more here */
-static format formats[]={{"STIL",STIL_write_header,STIL_write_tail,
-    STIL_write_range,".txt",".json","-stil"},
-    {"AESE",AESE_write_header,AESE_write_tail,
-    AESE_write_range,".txt",".xml","-aese"}};
-/** size of formats array */
-static int num_formats = sizeof(formats)/sizeof(format);
+static UChar *U_ENGB;
+static UChar *U_TEI;
+static UChar *U_AMP;
+static UChar *U_STIL;
+/* this has to be public so we can initialise it in main */
+struct format_struct
+{
+	const UChar *name;
+	format_write_header hfunc;
+	format_write_tail tfunc;
+	format_write_range rfunc;
+	const char *text_suffix;
+	const char *markup_suffix;
+	const char *middle_name;
+};
 typedef struct 
 {
     userdata *user_data;
@@ -78,50 +88,50 @@ typedef struct
     /** source file minus suffix */
     char barefile[FILE_NAME_LEN];
     /** name of style */
-    char *style;
+    UChar *style;
     /** name of recipe file */
     char *recipe_file;
-    /** index into the currently selected format */
-    int selected_format;
     /** if doing help or version info don't process anything */
     int doing_help;
     /** language code */
-    char *language;
+    UChar *language;
     /** hard-hyphen object */
     hh_exceptions *hh_except;
     /** copy of commandline arg */
     char *hh_except_string;
     /** the parser */
     XML_Parser parser;
+    format *f;
 } stripper;
 /**
  * Copy an array of attributes as returned by expat
  * @param atts the attributes
  * @return a NULL terminated array, user must free
  */
-static char **copy_atts( const char **atts )
+static UChar **copy_atts( char **atts )
 {
-	int len = 0;
 	int i = 0;
-	char **new_atts;
+	UChar **new_atts;
 	while ( atts[i] != NULL )
     {
         i += 2;
-        len+=2;
     }
-    new_atts = calloc( len+2, sizeof(char*) );
-    i = 0;
-    while ( atts[i] != NULL )
+    new_atts = calloc( i+2, sizeof(UChar*) );
+    if ( new_atts != NULL )
     {
-        new_atts[i] = strdup(atts[i]);
-        if ( new_atts[i] == NULL )
-            fprintf( stderr,
-                "stripper: failed to allocate store for attribute key" );
-        new_atts[i+1] = strdup( atts[i+1] );
-        if ( new_atts[i+1] == NULL )
-            fprintf( stderr,
-                "stripper: failed to allocate store for attribute value" );
-        i += 2;
+        i = 0;
+        while ( atts[i] != NULL )
+        {
+            new_atts[i] = utf8toutf16(atts[i]);
+            if ( new_atts[i] == NULL )
+                fprintf( stderr,
+                    "stripper: failed to allocate store for attribute key" );
+            new_atts[i+1] = utf8toutf16( atts[i+1] );
+            if ( new_atts[i+1] == NULL )
+                fprintf( stderr,
+                    "stripper: failed to allocate store for attribute value" );
+            i += 2;
+        }
     }
     return new_atts;
 }
@@ -137,23 +147,36 @@ static void XMLCALL start_element_scan( void *userData,
 {
     range *r;
     userdata *u = userData;
-    char **new_atts;
-    char *simple_name = (char*)name;
-    //printf("start: %s\n",name);
-    if ( recipe_has_removal(userdata_rules(u),(char*)name) )
-        stack_push( userdata_ignoring(u), (char*)name );
-    new_atts = copy_atts( atts );
-    if ( stack_empty(userdata_ignoring(u)) && recipe_has_rule(userdata_rules(u),name,atts) )
-        simple_name = recipe_simplify( userdata_rules(u), simple_name, new_atts );
-    r = range_new( stack_empty(userdata_ignoring(u))?0:1,
-        simple_name,
-        new_atts,
-        userdata_toffset(u) );
-    // stack has to set length when we get to the range end
-    stack_push( userdata_range_stack(u), r );
-    // queue preserves the order of the start elements
-    dest_file *df = userdata_get_markup_dest( u, range_get_name(r) );
-    dest_file_enqueue( df, r );
+    UChar **new_atts;
+    int pushed = 0;
+    UChar *u_name = utf8toutf16((char*)name);
+    if ( u_name != NULL )
+    {
+        UChar *simple_name = u_name;
+        if ( recipe_has_removal(userdata_rules(u),u_name) )
+        {
+            stack_push(userdata_ignoring(u),u_name);
+            pushed = 1;
+            // save on stack, free when popped
+        }
+        new_atts = copy_atts( (char**)atts );
+        if ( stack_empty(userdata_ignoring(u)) 
+            && recipe_has_rule(userdata_rules(u),u_name,new_atts) )
+            simple_name = recipe_simplify( userdata_rules(u), u_name, new_atts );
+        r = range_new( stack_empty(userdata_ignoring(u))?0:1,
+            simple_name,
+            new_atts, userdata_toffset(u) );
+        if ( r != NULL )
+        {
+            // stack has to set length when we get to the range end
+            stack_push( userdata_range_stack(u), r );
+            // queue preserves the order of the start elements
+            dest_file *df = userdata_get_markup_dest( u, range_get_name(r) );
+            dest_file_enqueue( df, r );
+        }
+        if ( !pushed )
+            free( u_name );
+    }
 }
 /**
  * End element handler for XML split
@@ -167,9 +190,18 @@ static void XMLCALL end_element_scan(void *userData, const char *name)
     //printf("end: %s\n",name);
     int rlen = userdata_toffset(u)-range_get_start(r);
     range_set_len( r, rlen );
-	if ( !stack_empty(userdata_ignoring(u)) 
-        && strcmp(stack_peek(userdata_ignoring(u)),name)==0 )
-		stack_pop( userdata_ignoring(u) );
+	UChar *u_name = utf8toutf16((char*)name);
+    if ( u_name != NULL )
+    {
+        if ( !stack_empty(userdata_ignoring(u)) 
+            && u_strcmp(stack_peek(userdata_ignoring(u)),u_name)==0 )
+        {
+            UChar *popped = stack_pop( userdata_ignoring(u) );
+            if ( popped != NULL )
+                free( popped );
+        }
+        free( u_name );
+    }
 }
 /**
  * Is the given string just whitespace?
@@ -454,16 +486,22 @@ static void process_hyphen( userdata *u, XML_Char *text, int len )
         //else
         //    printf("weak: %s\n",combined);
         // create a range to describe a hard hyphen
-        char **atts = calloc(1,sizeof(char*));
+        UChar **atts = calloc(1,sizeof(UChar*));
         if ( atts != NULL )
         {
-            range *r = range_new( 0, force, atts, userdata_hoffset(u) );
-            if ( r != NULL )
+            
+            UChar *u_force = utf8toutf16(force);
+            if ( u_force != NULL )
             {
-                dest_file *df = userdata_get_markup_dest( u, force );
-                userdata_set_hyphen_state(u,HYPHEN_NONE);
-                range_set_len( r, 1 );
-                dest_file_enqueue( df, r );
+               range *r = range_new( 0, u_force, atts, userdata_hoffset(u) );
+                if ( r != NULL )
+                { 
+                    dest_file *df = userdata_get_markup_dest( u, u_force );
+                    userdata_set_hyphen_state(u,HYPHEN_NONE);
+                    range_set_len( r, 1 );
+                    dest_file_enqueue( df, r );
+                }
+                free( u_force );
             }
         }
         else
@@ -489,14 +527,14 @@ static void XMLCALL charhndl( void *userData, const XML_Char *s, int len )
 	{
 		size_t n;
         if ( len == 1 && s[0] == '&' )
-		{
-			n = dest_file_write( userdata_text_dest(u), "&amp;", 5 );
-			userdata_inc_toffset( u, 5 );
+        {
+            n = dest_file_write( userdata_text_dest(u), U_AMP, u_strlen(U_AMP) );
+            userdata_inc_toffset( u, u_strlen(U_AMP) );
             userdata_set_last_char_type(u,CHAR_TYPE_TEXT);
-		}
+        }
         else 
-		{
-			char *text = (char*)s;
+	    {
+            char *text = (char*)s;
             if ( userdata_hyphen_state(u) == HYPHEN_LF 
                 && !is_whitespace(text,len) )
                 process_hyphen(u,text,len);
@@ -510,24 +548,37 @@ static void XMLCALL charhndl( void *userData, const XML_Char *s, int len )
             if ( len > 0 )
             {
                 //int ulen = utf8_len(text,len);
-                n = dest_file_write( userdata_text_dest(u), text, len );
-                userdata_inc_toffset( u, len );
-                //if ( ulen != len )
-                //    printf("ulen!=len\n");
-                if ( n != len )
-                    error( "stripper: write error on text file" );
+                UChar *u_text = utf8toutf16Len( text, len );
+                if ( u_text != NULL )
+                {
+                    n = dest_file_write( userdata_text_dest(u), u_text, 
+                        u_strlen(u_text) );
+                    userdata_inc_toffset( u, u_strlen(u_text) );
+                    //if ( ulen != len )
+                    //    printf("ulen!=len\n");
+                    if ( n <= 0 )
+                        error( "stripper: write error on text file" );
+                    free( u_text );
+                }
             }
-		}
-	}
+        }
+    }
     else if ( !is_whitespace(s,len) )
     {
         range *r = stack_peek( userdata_range_stack(u) );
         if ( len == 1 && s[0] == '&' )
         {
-			range_add_content( r, "&amp;", 5 );
+			range_add_content( r, U_AMP, u_strlen(U_AMP) );
         }
         else
-            range_add_content( r, s, len );
+        {
+            UChar *u_s = utf8toutf16Len((char*)s,len);
+            if ( u_s != NULL )
+            {
+                range_add_content( r, u_s, u_strlen(u_s) );
+                free( u_s );
+            }
+        }
     }
     // else it's inter-element white space
 }
@@ -568,34 +619,35 @@ static int scan_source( const char *buf, int len, stripper *s )
 	return res;
 }
 /**
- * Look up a format in our list.
- * @param fmt_name the format's name
- * @return its index in the table or -1
- */
-static int lookup_format( const char *fmt_name )
-{
-	int i;
-	for ( i=0;i<num_formats;i++ )
-	{
-		if ( strcmp(formats[i].name,fmt_name)==0 )
-			return i;
-	}
-	return -1;
-}
-/**
  * Dispose of a stripper
  * @param s the stripper perhaps partly completed
  */
 void stripper_dispose( stripper *s )
 {
-    if ( s->user_data != NULL )
-        userdata_dispose( s->user_data );
-    if ( s->hh_except_string != NULL )
-        free( s->hh_except_string );
-    if ( s->hh_except != NULL )
-        hh_exceptions_dispose( s->hh_except );
     if ( s != NULL )
+    {
+        if ( s->user_data != NULL )
+            userdata_dispose( s->user_data );
+        if ( s->hh_except_string != NULL )
+            free( s->hh_except_string );
+        if ( s->hh_except != NULL )
+            hh_exceptions_dispose( s->hh_except );
+        if ( s->style != NULL )
+            free( s->style );
+        if ( s->language != U_ENGB && s->language != NULL )
+            free( s->language );
+        if ( s->f != NULL )
+            free( s->f );
         free( s );
+    }
+    if ( U_TEI != NULL )
+        free( U_TEI );
+    if ( U_AMP != NULL )
+        free( U_AMP );
+    if ( U_ENGB != NULL )
+        free( U_ENGB );
+    if ( U_STIL != NULL )
+        free( U_STIL );
 }
 /**
  * Create a stripper object. We need this for thread safety
@@ -606,8 +658,22 @@ stripper *stripper_create()
     stripper *s = calloc( 1, sizeof(stripper) );
     if ( s != NULL )
     {
-        s->language = "en_GB";
-        s->style = "TEI";
+        U_ENGB = utf8toutf16("en_GB");
+        U_TEI = utf8toutf16("TEI");
+        U_AMP = utf8toutf16("&amp;");
+        U_STIL = utf8toutf16("STIL");
+        /** array of available formats - add more here */
+        format *f = calloc( 1, sizeof(format) );
+        s->f = f;
+        f->name = U_STIL;
+        f->hfunc = STIL_write_header;
+        f->tfunc=STIL_write_tail;
+        f->rfunc=STIL_write_range;
+        f->text_suffix=".txt";
+        f->markup_suffix=".json";
+        f->middle_name="-stil";
+        s->language = U_ENGB;
+        s->style = U_TEI;
     }
     else
         fprintf(stderr,"stripper: failed to allocate object\n");
@@ -654,50 +720,81 @@ static char *html2xhtml( const char *input, int *len )
       tidyRelease( tdoc );
   return out;
 }
+format_write_range format_rfunc(format *f)
+{
+    return f->rfunc;
+}
+format_write_tail format_tfunc(format *f)
+{
+    return f->tfunc;
+}
+format_write_header format_hfunc(format *f)
+{
+    return f->hfunc;
+}
+const char *format_text_suffix(format *f)
+{
+    return f->text_suffix;
+}
+const char *format_markup_suffix(format *f)
+{
+    return f->markup_suffix;
+}
+const char *format_middle_name(format *f)
+{
+    return f->middle_name;
+}
 #ifdef JNI
-static void unload_string( JNIEnv *env, jstring jstr, const char *cstr, 
+static void unload_string( JNIEnv *env, jstring jstr, const jchar *ustr, 
+    jboolean copied )
+{
+    if ( copied )
+        (*env)->ReleaseStringChars( env, jstr, ustr );
+}
+static void unload_string_c( JNIEnv *env, jstring jstr, const char *cstr, 
     jboolean copied )
 {
     if ( copied )
         (*env)->ReleaseStringUTFChars( env, jstr, cstr );
 }
-static const char *load_string( JNIEnv *env, jstring jstr, jboolean *copied )
+static const jchar *load_string( JNIEnv *env, jstring jstr, jboolean *copied )
+{
+    return (*env)->GetStringChars(env, jstr, copied);  
+}
+static const char *load_string_c( JNIEnv *env, jstring jstr, jboolean *copied )
 {
     return (*env)->GetStringUTFChars(env, jstr, copied);  
 }
 /*
  * Class:     calliope_AeseStripper
  * Method:    strip
- * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLcalliope/json/JSONResponse;Lcalliope/json/JSONResponse;)I
+ * Signature: (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ZLcalliope/json/JSONResponse;Lcalliope/json/JSONResponse;)I
  */
 JNIEXPORT jint JNICALL Java_calliope_AeseStripper_strip
-  (JNIEnv *env, jobject obj, jstring xml, jstring rules, jstring format, 
+  (JNIEnv *env, jobject obj, jstring xml, jstring rules, 
     jstring style, jstring language, jstring hexcepts, jboolean is_html,
     jobject text, jobject markup)
 {
 	int res = 1;
-    jboolean x_copied,r_copied=JNI_FALSE,f_copied,s_copied,h_copied,l_copied=JNI_FALSE;
-    const char *x_str = load_string( env, xml, &x_copied );
+    jboolean x_copied,r_copied=JNI_FALSE,s_copied,h_copied,l_copied=JNI_FALSE;
+    const char *x_str = load_string_c( env, xml, &x_copied );
     //fprintf(stderr,"x_str=%s r_str\n",x_str);
-    const char *r_str = (rules!=NULL)?load_string(env,rules,&r_copied):NULL;
-    //fprintf(stderr,"r_str=%s\n",r_str);
-    const char *f_str = load_string( env, format, &f_copied );
+    const char *r_str = (rules!=NULL)?load_string_c(env,rules,&r_copied):NULL;
     //fprintf(stderr,"f_str=%s\n",f_str);
-    const char *s_str = load_string( env, style, &s_copied );
+    const jchar *s_str = load_string( env, style, &s_copied );
     //fprintf(stderr,"s_str=%s\n",s_str);
-    const char *l_str = (language==NULL)?"en_GB"
+    const jchar *l_str = (language==NULL)?U_ENGB
         :load_string( env, language, &l_copied );
     //fprintf(stderr,"l_str=%s\n",l_str);
     const char *h_str = (hexcepts==NULL)?NULL
-        :load_string( env, hexcepts, &h_copied );
+        :load_string_c( env, hexcepts, &h_copied );
     //fprintf(stderr,"h_str=%s\n",h_str);
     char *xhtml = NULL;
     stripper *s = stripper_create();
     if ( s != NULL )
     {
         recipe *ruleset;
-        s->hh_except_string = (h_str==NULL)?NULL:strdup(h_str);
-        s->selected_format = lookup_format( f_str );
+        s->hh_except_string = (char*)h_str;
         // load or initialise rule set
         if ( rules == NULL )
             ruleset = recipe_new();
@@ -707,16 +804,16 @@ JNIEXPORT jint JNICALL Java_calliope_AeseStripper_strip
         if ( hhe != NULL )
         {
             s->user_data = userdata_create( s->language, s->barefile, 
-                ruleset, &formats[s->selected_format], hhe );
+                ruleset, &stil_format, hhe );
             if ( s->user_data != NULL )
             {
                 // write header
                 int i=0;
                 while ( res && userdata_markup_dest(s->user_data,i)!= NULL )
                 {
-                    res = formats[s->selected_format].hfunc( NULL, 
-                        dest_file_dst(
-                            userdata_markup_dest(s->user_data,i)), s_str );
+                    res = stil_format.hfunc( NULL, 
+                        dest_file_dst(userdata_markup_dest(s->user_data,i)), 
+                        (jchar*)s_str );
                     i++;
                 }
                 // parse XML
@@ -728,7 +825,7 @@ JNIEXPORT jint JNICALL Java_calliope_AeseStripper_strip
                         xhtml = html2xhtml( x_str, &xlen );
                         if ( xhtml != NULL )
                         {
-                            unload_string( env, xml, x_str, x_copied );
+                            unload_string_c( env, xml, x_str, x_copied );
                             x_copied = JNI_FALSE;
                             x_str = xhtml;
                         }
@@ -744,53 +841,65 @@ JNIEXPORT jint JNICALL Java_calliope_AeseStripper_strip
         stripper_dispose( s );
         if ( xhtml != NULL )
             free( xhtml );
-        unload_string( env, xml, x_str, x_copied );
-        unload_string( env, rules, r_str, r_copied );
-        unload_string( env, format, f_str, f_copied );
+        unload_string_c( env, xml, x_str, x_copied );
+        unload_string_c( env, rules, r_str, r_copied );
         unload_string( env, style, s_str, s_copied );
         unload_string( env, language, l_str, l_copied );
         if ( h_str != NULL )
-            unload_string( env, hexcepts, h_str, h_copied );
+            unload_string_c( env, hexcepts, h_str, h_copied );
     }
     return res;
 }
-/*
- * Class:     AeseStripper
- * Method:    version
- * Signature: ()Ljava/lang/String;
- */
-JNIEXPORT jstring JNICALL Java_aeseserver_AeseStripper_version
-  (JNIEnv *env, jobject obj )
-{
-	return (*env)->NewStringUTF(env, 
-		"stripper version 1.1 (c) Desmond Schmidt 2011" );
-}
-
-/*
- * Class:     calliope_AeseStripper
- * Method:    formats
- * Signature: ()[Ljava/lang/String;
- */
-JNIEXPORT jobjectArray JNICALL Java_calliope_AeseStripper_formats
-(JNIEnv *env, jobject obj )
-{
-	jobjectArray ret = (jobjectArray)(*env)->NewObjectArray(
-		env,
-        num_formats,
- 		(*env)->FindClass(env,"java/lang/String"),
-		(*env)->NewStringUTF(env,""));
-	if ( ret != NULL )
-	{
-		int i;
-        for( i=0;i<num_formats;i++ ) 
-		{
-		    (*env)->SetObjectArrayElement(env,
-				ret,i,(*env)->NewStringUTF(env, formats[i].name));
-		}
-	}
-	return ret;
-}
 #elif COMMANDLINE
+/**
+ * Get the file length of the src file
+ * @return its length as an int
+ */
+static int file_size( const char *file_name )
+{
+    FILE *fp = fopen( file_name, "r" );
+    long sz = -1;
+    if ( fp != NULL )
+    {
+        fseek(fp, 0L, SEEK_END);
+        sz = ftell(fp);
+        fclose( fp );
+    }
+    return (int) sz;
+}
+/**
+ * Read a file contents 
+ * @param file_name the name of the file to read
+ * @param len its length once entirely read
+ * @return an allocated buffer. caller MUST dispose
+ */
+static const char *read_file( const char *file_name, int *len )
+{
+    char *buf = NULL;
+    *len = file_size(file_name);
+    if ( *len > 0 )
+    {
+        FILE *src_file = fopen( file_name, "r" );
+        int flen;
+        if ( src_file != NULL )
+        {
+            buf = calloc( 1, (*len)+1 );
+            if ( buf != NULL )
+            {
+                flen = (int)fread( buf, 1, *len, src_file );
+                if ( flen != *len )
+                    fprintf(stderr,"couldn't read %s\n",file_name);
+            }
+            else
+                fprintf(stderr,"couldn't allocate buf\n");
+            fclose( src_file );
+            
+        }
+        else
+            fprintf(stderr,"failed to open %s\n",file_name );
+    }
+    return buf;
+}
 /**
  * Print a simple help message. If we get time we can
  * make a man page later.
@@ -807,10 +916,9 @@ static void print_help()
 		"written to another file. Options are: \n"
 		"-h print this help message\n"
 		"-v print the version information\n"
-        "-s style. Specify a style name (default \"TEI\")\n"
-		"-f format. Specify a supported format\n"
-		"-l list supported formats\n"
-        "-e hh_exceptions ensure these space-delimited compound words ARE "
+        "-s style Specify a style name (default \"TEI\")\n"
+		"-l language a two-char language code or variant like en_GB\n"
+		"-e hh_exceptions ensure these space-delimited compound words ARE "
         "hyphenated\nIF both halves are words and the compound is also, e.g. safeguard\n"
 		"-r recipe-file specifying removals and simplifications in XML or JSON\n"
 		"XML-file the only real argument is the name of an XML "
@@ -832,20 +940,6 @@ static int file_exists( const char *file )
 	return 0;
 }
 /**
- * List the formats registered with the main program. If the user
- * defines another format he/she must call the register routine to 
- * register it. Then this command returns a list of dynamically
- * registered formats.
-*/
-static void list_formats()
-{
-	int i;
-	for ( i=0;i<num_formats;i++ )
-	{
-		printf( "%s\n",formats[i].name );
-	}
-}
-/**
  * Check the commandline arguments
  * @param argc number of commandline args+1
  * @param argv array of arguments, first is program name
@@ -860,46 +954,33 @@ static int check_args( int argc, char **argv, stripper *s )
 		sane = 0;
 	else
 	{
-		int i,rlen;
-        const char *rdata = NULL;
-		for ( i=1;i<argc;i++ )
+		int i;
+        for ( i=1;i<argc;i++ )
 		{
 			if ( strlen(argv[i])==2 && argv[i][0]=='-' )
 			{
 				switch ( argv[i][1] )
 				{
 					case 'v':
-						printf( "stripper version 1.1 (c) "
-								"Desmond Schmidt 2011\n");
+						printf( "stripper version 2.0 (c) "
+								"Desmond Schmidt 2015\n");
 						s->doing_help = 1;
 						break;
 					case 'h':
 						print_help();
 						s->doing_help = 1;
 						break;
-					case 'f':
-						if ( i < argc-2 )
-						{
-							s->selected_format = lookup_format( argv[i+1] );
-							if ( s->selected_format == -1 )
-								error("stripper: format %s not supported.\n",
-                                    argv[i+1]);
-						}
-						else
-							sane = 0;
-						break;
-					case 'l':
-						list_formats();
-						s->doing_help = 1;
-						break;
-                    case 'r':
+					case 'r':
                         s->recipe_file = argv[i+1];
                         break;
                     case 's':
-                        s->style = argv[i+1];
+                        s->style = utf8toutf16(argv[i+1]);
                         break;
                     case 'e':
                         s->hh_except_string = strdup(argv[i+1]);
+                        break;
+                    case 'l':
+                        s->language = utf8toutf16(argv[i+1]);
                         break;
 				}
 			}
@@ -920,6 +1001,8 @@ static int check_args( int argc, char **argv, stripper *s )
                     dot_pos[0] = 0;
             }
 		}
+        if ( s->language == NULL )
+            sane = 0;
 	}
 	return sane;
 }
@@ -928,7 +1011,7 @@ static int check_args( int argc, char **argv, stripper *s )
  */
 static void usage()
 {
-	printf( "usage: stripper [-h] [-v] [-s style] [-l] [-f format] "
+	printf( "usage: stripper [-h] [-v] [-l lang] [-s style] "
         "[-r recipe] [-e hh_exceptions] XML-file\n" );
 }
 /**
@@ -962,7 +1045,7 @@ int main( int argc, char **argv )
             {
                 s->hh_except = hh_exceptions_create( s->hh_except_string );
                 s->user_data = userdata_create( s->language, s->barefile, 
-                    rules, &formats[s->selected_format], s->hh_except );
+                    rules, s->f, s->hh_except );
                 if ( s->user_data == NULL )
                 {
                     fprintf(stderr,"stripper: failed to initialise userdata\n");
@@ -974,8 +1057,8 @@ int main( int argc, char **argv )
                     userdata *u = s->user_data;
                     while ( userdata_markup_dest(u,i) )
                     {
-                        res = formats[s->selected_format].hfunc( NULL, 
-                            dest_file_dst(userdata_markup_dest(u,i)), s->style );
+                        res = s->f->hfunc( NULL, 
+                            userdata_markup_dest(u,i), s->style );
                         i++;
                     }
                     // parse XML, prepare body for writing

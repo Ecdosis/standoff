@@ -18,20 +18,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
+#include <unicode/ustdio.h>
 #include "hashmap.h"
 #include "attribute.h"
 #include "annotation.h"
 #include "range.h"
 #include "node.h"
 #include "error.h"
-#include "master.h"
-#include "text_buf.h"
-#include "output.h"
+#include "HTML.h"
+#include "utils.h"
 #include "memwatch.h"
+static UChar U_ROOT[] = {'r','o','o','t'};
 struct node_struct
 {
-	char *name;
-    char *output_name;
+	UChar *name;
+    UChar *html_name;
 	int offset;
 	int len;
     int empty;
@@ -51,7 +54,7 @@ struct node_struct
  * @param empty 1 if the html element is empty
  * @return the newly formed node
  */
-node *node_create( char *name, char *output_name, int offset, int len, 
+node *node_create( UChar *name, UChar *html_name, int offset, int len, 
     int empty, int rightmost )
 {
     node *n = calloc( 1, sizeof(node) );
@@ -60,8 +63,8 @@ node *node_create( char *name, char *output_name, int offset, int len,
         //unsigned long u = 0x10019ecf0;
         //if ( (unsigned long) n == u )
         //    printf("0x10019ecf0\n");
-        n->name = strdup( name );
-        n->output_name = (output_name==NULL)?NULL:strdup( output_name );
+        n->name = u_strdup( name );
+        n->html_name = (html_name==NULL)?NULL:u_strdup( html_name );
         n->offset = offset;
         n->len = len;
         n->empty = empty;
@@ -88,10 +91,10 @@ void node_dispose( node *n )
         free( n->name );
         n->name = NULL;
     }
-    if ( n->output_name != NULL )
+    if ( n->html_name != NULL )
     {
-        free( n->output_name );
-        n->output_name = NULL;
+        free( n->html_name );
+        n->html_name = NULL;
     }
     if ( n->attrs != NULL )
         attribute_dispose( n->attrs );
@@ -113,12 +116,12 @@ int node_has_parent( node *n )
  * @param name the name of the attribute
  * @return NULL if not found or the attribute
  */
-attribute *node_get_attribute( node *n, char *name )
+attribute *node_get_attribute( node *n, UChar *name )
 {
     attribute *a = n->attrs;
     while ( a != NULL )
     {
-        if ( strcmp(attribute_get_name(a),name)==0 )
+        if ( u_strcmp(attribute_get_name(a),name)==0 )
             return a;
         else
             a = attribute_get_next( a );
@@ -136,7 +139,7 @@ node *node_first( node *n )
         return n->parent->children;
     else
     {
-        if ( strcmp(node_name(n),"root")!=0 )
+        if ( u_strcmp(node_name(n),U_ROOT)!=0 )
             warning("node: attempt to access empty parent\n");
         return n;
     }
@@ -346,8 +349,8 @@ int node_end( node *n )
  */
 void node_split( node *n, int pos )
 {
-    node *next = node_create( n->name, n->output_name, pos, node_end(n)-pos,
-        html_is_empty(n->output_name), n->rightmost );
+    node *next = node_create( n->name, n->html_name, pos, node_end(n)-pos,
+        html_is_empty(n->html_name), n->rightmost );
     attribute *attr = n->attrs;
     while ( attr != NULL )
     {
@@ -457,18 +460,18 @@ node *node_prec_sibling( node *n )
  * @param n the node in question
  * @return the name of the node
  */
-char *node_name( node *n )
+UChar *node_name( node *n )
 {
     return n->name;
 }
 /**
- * Get a node's output tag name
+ * Get a node's html tag name
  * @param n the node in question
  * @return the name of the node
  */
-char *node_output_name( node *n )
+UChar *node_html_name( node *n )
 {
-    return n->output_name;
+    return n->html_name;
 }
 /**
  * Does the new node precede the in-tree node?
@@ -521,7 +524,7 @@ int node_overlaps_on_right( node *n, node *r )
  */
 range *node_to_range( node *n )
 {
-    range *r = range_create( node_name(n), node_output_name(n), node_offset(n), 
+    range *r = range_create( node_name(n), node_html_name(n), node_offset(n), 
         node_len(n) ); 
     range_set_rightmost( r, n->rightmost );
     attribute *attr = n->attrs;
@@ -554,18 +557,18 @@ void node_add_attribute( node *n, attribute *a )
  * @param atts its attributes
  * @param limit the limit on the length of atts
  */
-void node_get_attributes( node *n, char *atts, int limit )
+void node_get_attributes( node *n, UChar *atts, int limit )
 {
     attribute *temp = n->attrs;
     int pos = 0;
     atts[0] = 0;
     while ( temp != NULL )
     {
-        char *name = attribute_get_name( temp );
-        char *value = attribute_get_value( temp );
-        if ( strlen(name)+strlen(value)+6+pos < limit )
+        UChar *name = attribute_get_name( temp );
+        UChar *value = attribute_get_value( temp );
+        if ( u_strlen(name)+u_strlen(value)+6+pos < limit )
         {
-            pos += snprintf( &atts[pos],limit-pos," %s=\"%s\"",name,value );
+            pos += u_snprintf( &atts[pos],limit-pos," %s=\"%s\"",name,value );
             temp = attribute_get_next( temp );
         }
         else
@@ -598,13 +601,4 @@ int node_is_root( node *n )
 int node_rightmost( node *n )
 {
     return n->rightmost;
-}
-/**
- * Override length of erroneous node
- * @param n the node that has the wrong length
- * @param new_end its new end
- */
-void node_set_end( node *n, int new_end )
-{
-    n->len = new_end-n->offset;
 }

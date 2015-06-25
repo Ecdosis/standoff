@@ -10,17 +10,14 @@
 extern "C" {
 #endif
 typedef struct master_struct master;
-typedef enum { UNKNOWN, HTML, XML, Markdown } output_fmt_type; 
 
-master *master_create( char *text, int len, output_fmt_type output_format );
+master *master_create( UChar *text, int len );
 void master_dispose( master *hf );
-int master_load_markup( master *hf, const char *markup, int mlen, 
-    const char *fmt );
-int master_load_css( master *hf, const char *css, int len );
-char *master_convert( master *hf );
-int master_get_output_len( master *hf );
-char *master_list( char *buf, int len );
-
+int master_load_markup( master *hf, const UChar *markup, int len ); 
+int master_get_html_len( master *hf );
+int master_load_css( master *hf, const UChar *css, int len );
+UChar *master_convert( master *hf );
+UChar *master_list();
 #ifdef	__cplusplus
 }
 #endif

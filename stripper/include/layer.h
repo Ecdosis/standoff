@@ -12,10 +12,10 @@
 extern "C" {
 #endif
 typedef struct layer_struct layer;
-layer *layer_create( char *name, milestone *milestones );
+layer *layer_create( UChar *name, milestone *milestones );
 layer *layer_dispose( layer *l );
-char *layer_name( layer *l );
-int layer_has_milestone( layer *l, char *mname );
+UChar *layer_name( layer *l );
+int layer_has_milestone( layer *l, UChar *mname );
 
 #ifdef	__cplusplus
 }

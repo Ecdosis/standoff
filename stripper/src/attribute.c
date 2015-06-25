@@ -1,12 +1,15 @@
 #include <stdlib.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "attribute.h"
 #include "error.h"
+#include "utils.h"
 #include "memwatch.h"
 struct attribute_struct
 {
-    char *name;
-    char *value;
+    UChar *name;
+    UChar *value;
 };
 /**
  * Create a new attribute
@@ -14,10 +17,11 @@ struct attribute_struct
  * @param value value of attribute
  * @return the new attribute
  */
-attr1bute *attribute_new( const char *name, const char *value )
+attr1bute *attribute_new( const UChar *name, const UChar *value )
 {
-    char *new_name = strdup( name );
-    char *new_value = strdup( value );
+    UChar *new_name = u_strdup( (UChar*)name );
+    UChar *new_value = u_strdup( (UChar*)value );
+    /* avoid name conflict */
     attr1bute *a = calloc( 1, sizeof(attr1bute) );
     if ( a == NULL || new_name == NULL || new_value == NULL )
     {
@@ -52,14 +56,14 @@ void attribute_delete( attr1bute *attr )
  * @param attrs the expat list of attributes (name, value pairs)
  * @return 1 if present, else 0
  */
-int attribute_present( attr1bute *a, char **attrs )
+int attribute_present( attr1bute *a, UChar **attrs )
 {
     int i = 0;
     int res = 0;
     while ( attrs[i] != NULL )
     {
-        if ( strcmp(attrs[i],attribute_get_name(a))==0
-            &&strcmp(attrs[i+1],attribute_get_value(a))==0 )
+        if ( u_strcmp(attrs[i],attribute_get_name(a))==0
+            &&u_strcmp(attrs[i+1],attribute_get_value(a))==0 )
         {
             res = 1;
             break;
@@ -73,7 +77,7 @@ int attribute_present( attr1bute *a, char **attrs )
  * @param a the attribute in question
  * @return the attribute value
  */
-char *attribute_get_name( attr1bute *a )
+UChar *attribute_get_name( attr1bute *a )
 {
     return a->name;
 }
@@ -82,7 +86,7 @@ char *attribute_get_name( attr1bute *a )
  * @param a the attribute in question
  * @return the attribute value
  */
-char *attribute_get_value( attr1bute *a )
+UChar *attribute_get_value( attr1bute *a )
 {
     return a->value;
 }
@@ -91,13 +95,13 @@ char *attribute_get_value( attr1bute *a )
  * @param a the attribute to apply to he list
  * @param attrs the copy of the expat attribute list (updated)
  */
-void attribute_remove( attr1bute *a, char **attrs )
+void attribute_remove( attr1bute *a, UChar **attrs )
 {
     int i = 0;
     while ( attrs[i] != NULL )
     {
-        if ( strcmp(attribute_get_name(a),attrs[i])==0
-            && strcmp(attribute_get_value(a),attrs[i+1])==0 )
+        if ( u_strcmp(attribute_get_name(a),attrs[i])==0
+            && u_strcmp(attribute_get_value(a),attrs[i+1])==0 )
         {
             free( attrs[i] );
             free( attrs[i+1] );
@@ -112,5 +116,4 @@ void attribute_remove( attr1bute *a, char **attrs )
         }
         i += 2;
     }
-    
 }

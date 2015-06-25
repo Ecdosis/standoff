@@ -1,7 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "milestone.h"
+#include "utils.h"
 
 /**
  * Milestone elements in XML typically cover a range but are used 
@@ -14,7 +17,7 @@
  */
 struct milestone_struct
 {
-    char *name;
+    UChar *name;
     milestone *next;
 };
 
@@ -22,12 +25,12 @@ struct milestone_struct
  * Create a milestone
  * @return an initialised milestone
  */
-milestone *milestone_create( char *name )
+milestone *milestone_create( UChar *name )
 {
     milestone *m = calloc( 1, sizeof(milestone) );
     if ( m != NULL )
     {
-        m->name = strdup(name);
+        m->name = u_strdup(name);
         if ( m->name == NULL )
             m = milestone_dispose( m );
     }
@@ -66,12 +69,12 @@ void milestone_append( milestone *parent, milestone *child )
  * @param name the name to search for
  * @return 1 if it does
  */
-int milestone_contains( milestone *head, char *name )
+int milestone_contains( milestone *head, UChar *name )
 {
     milestone *temp = head;
     while ( temp != NULL )
     {
-        if ( strcmp(temp->name,name)==0 )
+        if ( u_strcmp(temp->name,name)==0 )
             return 1;
         else
             temp = temp->next;
@@ -83,7 +86,7 @@ int milestone_contains( milestone *head, char *name )
  * @param m the milestone in question
  * @return its name
  */
-char *milestone_name( milestone *m )
+UChar *milestone_name( milestone *m )
 {
     return m->name;
 }
