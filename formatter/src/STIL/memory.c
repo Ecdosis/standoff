@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <syslog.h>
+#include <unicode/uchar.h>
 #include "hashmap.h"
 
 #ifdef DEBUG_MEMORY

@@ -27,6 +27,7 @@
 #include <unicode/ustring.h>
 #include "text_buf.h"
 #include "error.h"
+#include "encoding.h"
 #include "memwatch.h"
 /** a dynamically resizeable text buffer to hold output */
 struct text_buf_struct
@@ -74,6 +75,18 @@ void text_buf_dispose( text_buf *tb )
         tb->buf = NULL;
     }
     free( tb );
+}
+int text_buf_concat_utf8( text_buf *tb, char *text, int len )
+{
+    UChar *utf16txt = utf8toutf16Len(text, len);
+    if ( utf16txt != NULL )
+    {
+        int res = text_buf_concat(tb,utf16txt,len);
+        free( utf16txt);
+        return res;
+    }
+    else
+        return 0;
 }
 /**
  * Concatenate some text to the buf

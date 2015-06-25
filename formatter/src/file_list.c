@@ -208,9 +208,11 @@ static int get_file_length( FILE *fp )
  * @param index the index into the filelist specifying the file
  * @param data pointer to a handle to allocate and copy data to
  * @param len VAR parameter for file length
+ * @param uchars 1 if utf16 data is desired else 0 for utf8
  * @return 1 if successful, else 0
  */
-int file_list_load( file_list *fl, int index, UChar **data, int *len )
+static int file_list_load_data( file_list *fl, int index, void **data, 
+    int *len, int uchars )
 {
     int res = 0;
     char *cdata;
@@ -224,7 +226,7 @@ int file_list_load( file_list *fl, int index, UChar **data, int *len )
                 int flen = get_file_length( fp );
                 if ( flen > 0 )
                 {
-                    cdata = malloc( flen );
+                    cdata = malloc( flen+1 );
                     if ( cdata == NULL )
                         error( "file_list: no memory for markup\n" );
                     else
@@ -241,12 +243,23 @@ int file_list_load( file_list *fl, int index, UChar **data, int *len )
                         else
                         {
                             *len = n;
-                            int needed = measure_from_encoding( cdata, n, "UTF-8" );
-                            *data = calloc( needed, sizeof(UChar) );
-                            if ( *data != NULL )
+                            if ( uchars )
                             {
-                                res = convert_from_encoding( cdata, n, *data,
-                                    needed, "UTF-8" );
+                                int needed = measure_from_encoding( cdata, n, 
+                                    "UTF-8" );
+                                *data = (UChar*)calloc( needed+1, sizeof(UChar) );
+                                if ( *data != NULL )
+                                {
+                                    res = convert_from_encoding( cdata, n, 
+                                        (UChar*)*data, needed+1, "UTF-8" );
+                                    *len = needed;
+                                }
+                            }
+                            else
+                            {
+                                *data = cdata;
+                                cdata[n] = 0;
+                                res = 1;
                             }
                         }
                     }
@@ -259,6 +272,30 @@ int file_list_load( file_list *fl, int index, UChar **data, int *len )
         }
     }
     return res;
+}
+/**
+ * Load the contents of a file
+ * @param fl the filelist in question
+ * @param index the index into the filelist specifying the file
+ * @param data pointer to a handle to allocate and copy data to
+ * @param len VAR parameter for file length
+ * @return 1 if successful, else 0
+ */
+int file_list_load_utf16( file_list *fl, int index, UChar **data, int *len )
+{
+    return file_list_load_data(fl,index,(void**)data,len,1);
+}
+/**
+ * Load the contents of a file
+ * @param fl the filelist in question
+ * @param index the index into the filelist specifying the file
+ * @param data pointer to a handle to allocate and copy data to
+ * @param len VAR parameter for file length
+ * @return 1 if successful, else 0
+ */
+int file_list_load_utf8( file_list *fl, int index, char **data, int *len )
+{
+    return file_list_load_data(fl,index,(void**)data,len,0);
 }
 /**
  * Does this file-list contain the given name?

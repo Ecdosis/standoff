@@ -3,7 +3,37 @@
 #include <string.h>
 #include <stdlib.h>
 #include "utils.h"
+#include "memwatch.h"
 
+/**
+ * Convert an int to a ustr
+ * @param value the number to convert
+ * @param but where to store it
+ * @param limit the total number of UChars in buf
+ */
+UChar *u_itoa( int value, UChar *buf, int limit )
+{
+    int saved = value;
+    int len = 0;
+    do
+    {
+        value /= 10;
+        len++;
+    }
+    while ( value != 0 );
+    if ( len+1 < limit )
+    {
+        buf[len] = 0;
+        do
+        {
+            int rem = saved % 10;
+            saved /= 10;
+            buf[--len] = '0'+rem;
+        }
+        while ( saved != 0 );
+    }
+    return buf;
+}
 /**
  * Convert a standard char* string to a UChar one. Assume ASCII!
  * @param str the cstring to convert

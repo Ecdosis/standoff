@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="90">
+<configurationDescriptor version="95">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="AESE" projectFiles="true">
-        <itemPath>include/AESE/AESE.h</itemPath>
-      </logicalFolder>
       <logicalFolder name="f2" displayName="STIL" projectFiles="true">
         <itemPath>include/STIL/STIL.h</itemPath>
         <itemPath>include/STIL/cJSON.h</itemPath>
         <itemPath>include/STIL/memory.h</itemPath>
       </logicalFolder>
       <itemPath>include/HTML.h</itemPath>
-      <itemPath>include/MARKDOWN.h</itemPath>
-      <itemPath>include/XML.h</itemPath>
-      <itemPath>include/amigaconfig.h</itemPath>
       <itemPath>include/annotation.h</itemPath>
-      <itemPath>include/ascii.h</itemPath>
-      <itemPath>include/asciitab.h</itemPath>
       <itemPath>include/attribute.h</itemPath>
       <itemPath>include/calliope_AeseFormatter.h</itemPath>
       <itemPath>include/css_parse.h</itemPath>
@@ -26,36 +18,24 @@
       <itemPath>include/css_rule.h</itemPath>
       <itemPath>include/css_selector.h</itemPath>
       <itemPath>include/dom.h</itemPath>
+      <itemPath>include/encoding.h</itemPath>
       <itemPath>include/error.h</itemPath>
-      <itemPath>include/expat.h</itemPath>
-      <itemPath>include/expat_config.h</itemPath>
-      <itemPath>include/expat_external.h</itemPath>
       <itemPath>include/file_list.h</itemPath>
       <itemPath>include/formatter.h</itemPath>
       <itemPath>include/hashmap.h</itemPath>
       <itemPath>include/hashset.h</itemPath>
-      <itemPath>include/iasciitab.h</itemPath>
-      <itemPath>include/internal.h</itemPath>
-      <itemPath>include/latin1tab.h</itemPath>
-      <itemPath>include/macconfig.h</itemPath>
       <itemPath>include/master.h</itemPath>
       <itemPath>include/matrix.h</itemPath>
       <itemPath>include/matrix_queue.h</itemPath>
       <itemPath>include/memwatch.h</itemPath>
-      <itemPath>include/nametab.h</itemPath>
       <itemPath>include/node.h</itemPath>
-      <itemPath>include/output.h</itemPath>
       <itemPath>include/plain_text.h</itemPath>
       <itemPath>include/queue.h</itemPath>
       <itemPath>include/range.h</itemPath>
       <itemPath>include/range_array.h</itemPath>
       <itemPath>include/ruleset.h</itemPath>
       <itemPath>include/text_buf.h</itemPath>
-      <itemPath>include/utf8tab.h</itemPath>
-      <itemPath>include/winconfig.h</itemPath>
-      <itemPath>include/xmlrole.h</itemPath>
-      <itemPath>include/xmltok.h</itemPath>
-      <itemPath>include/xmltok_impl.h</itemPath>
+      <itemPath>include/utils.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -64,17 +44,12 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
-      <logicalFolder name="f1" displayName="AESE" projectFiles="true">
-        <itemPath>src/AESE/AESE.c</itemPath>
-      </logicalFolder>
       <logicalFolder name="f2" displayName="STIL" projectFiles="true">
         <itemPath>src/STIL/STIL.c</itemPath>
         <itemPath>src/STIL/cJSON.c</itemPath>
         <itemPath>src/STIL/memory.c</itemPath>
       </logicalFolder>
       <itemPath>src/HTML.c</itemPath>
-      <itemPath>src/MARKDOWN.c</itemPath>
-      <itemPath>src/XML.c</itemPath>
       <itemPath>src/annotation.c</itemPath>
       <itemPath>src/attribute.c</itemPath>
       <itemPath>src/css_parse.c</itemPath>
@@ -82,6 +57,7 @@
       <itemPath>src/css_rule.c</itemPath>
       <itemPath>src/css_selector.c</itemPath>
       <itemPath>src/dom.c</itemPath>
+      <itemPath>src/encoding.c</itemPath>
       <itemPath>src/error.c</itemPath>
       <itemPath>src/file_list.c</itemPath>
       <itemPath>src/formatter.c</itemPath>
@@ -94,16 +70,11 @@
       <itemPath>src/matrix_queue.c</itemPath>
       <itemPath>src/memwatch.c</itemPath>
       <itemPath>src/node.c</itemPath>
-      <itemPath>src/output.c</itemPath>
       <itemPath>src/queue.c</itemPath>
       <itemPath>src/range.c</itemPath>
       <itemPath>src/range_array.c</itemPath>
       <itemPath>src/text_buf.c</itemPath>
-      <itemPath>src/xmlparse.c</itemPath>
-      <itemPath>src/xmlrole.c</itemPath>
-      <itemPath>src/xmltok.c</itemPath>
-      <itemPath>src/xmltok_impl.c</itemPath>
-      <itemPath>src/xmltok_ns.c</itemPath>
+      <itemPath>src/utils.c</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
                    displayName="Test Files"
@@ -130,8 +101,8 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>include/STIL</pElem>
-            <pElem>include/AESE</pElem>
-            <pElem>/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers</pElem>
+            <pElem>/usr/lib/jvm/java-7-openjdk-amd64/include</pElem>
+            <pElem>/usr/lib/jvm/java-7-openjdk-amd64/include/linux</pElem>
           </incDir>
           <preprocessorList>
             <Elem>COMMANDLINE</Elem>
@@ -153,14 +124,12 @@
         <linkerTool>
           <linkerLibItems>
             <linkerLibStdlibItem>Mathematics</linkerLibStdlibItem>
+            <linkerLibFileItem>/usr/lib/x86_64-linux-gnu/libicuio.so</linkerLibFileItem>
+            <linkerLibFileItem>/usr/lib/x86_64-linux-gnu/libicuuc.so</linkerLibFileItem>
           </linkerLibItems>
         </linkerTool>
       </compileType>
-      <item path="include/AESE/AESE.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/HTML.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/MARKDOWN.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -168,15 +137,7 @@
       </item>
       <item path="include/STIL/memory.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/XML.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/amigaconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/annotation.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/asciitab.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -192,13 +153,9 @@
       </item>
       <item path="include/dom.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/encoding.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/error.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat_config.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat_external.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file_list.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -208,14 +165,6 @@
       </item>
       <item path="include/hashset.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/iasciitab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/internal.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/latin1tab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/macconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/master.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/matrix.h" ex="false" tool="3" flavor2="0">
@@ -224,11 +173,7 @@
       </item>
       <item path="include/memwatch.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nametab.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/node.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/output.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/plain_text.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -242,29 +187,15 @@
       </item>
       <item path="include/text_buf.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/utf8tab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/winconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmlrole.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmltok.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmltok_impl.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/AESE/AESE.c" ex="false" tool="0" flavor2="0">
+      <item path="include/utils.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/HTML.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/MARKDOWN.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/cJSON.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/memory.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/XML.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/annotation.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -279,6 +210,8 @@
       <item path="src/css_selector.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dom.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/encoding.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/error.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -304,8 +237,6 @@
       </item>
       <item path="src/node.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/output.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/queue.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/range.c" ex="false" tool="0" flavor2="0">
@@ -314,15 +245,7 @@
       </item>
       <item path="src/text_buf.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/xmlparse.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmlrole.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok_impl.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok_ns.c" ex="false" tool="0" flavor2="0">
+      <item path="src/utils.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -345,11 +268,7 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
-      <item path="include/AESE/AESE.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/HTML.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/MARKDOWN.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/STIL/STIL.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -357,15 +276,7 @@
       </item>
       <item path="include/STIL/memory.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/XML.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/amigaconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/annotation.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/ascii.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/asciitab.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -381,13 +292,9 @@
       </item>
       <item path="include/dom.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/encoding.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/error.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat_config.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/expat_external.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/file_list.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -397,14 +304,6 @@
       </item>
       <item path="include/hashset.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/iasciitab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/internal.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/latin1tab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/macconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/master.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/matrix.h" ex="false" tool="3" flavor2="0">
@@ -413,11 +312,7 @@
       </item>
       <item path="include/memwatch.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/nametab.h" ex="false" tool="3" flavor2="0">
-      </item>
       <item path="include/node.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/output.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/plain_text.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -431,29 +326,15 @@
       </item>
       <item path="include/text_buf.h" ex="false" tool="3" flavor2="0">
       </item>
-      <item path="include/utf8tab.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/winconfig.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmlrole.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmltok.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="include/xmltok_impl.h" ex="false" tool="3" flavor2="0">
-      </item>
-      <item path="src/AESE/AESE.c" ex="false" tool="0" flavor2="0">
+      <item path="include/utils.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="src/HTML.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/MARKDOWN.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/STIL.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/cJSON.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/STIL/memory.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/XML.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/annotation.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -468,6 +349,8 @@
       <item path="src/css_selector.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/dom.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/encoding.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/error.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -493,8 +376,6 @@
       </item>
       <item path="src/node.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/output.c" ex="false" tool="0" flavor2="0">
-      </item>
       <item path="src/queue.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/range.c" ex="false" tool="0" flavor2="0">
@@ -503,15 +384,7 @@
       </item>
       <item path="src/text_buf.c" ex="false" tool="0" flavor2="0">
       </item>
-      <item path="src/xmlparse.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmlrole.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok_impl.c" ex="false" tool="0" flavor2="0">
-      </item>
-      <item path="src/xmltok_ns.c" ex="false" tool="0" flavor2="0">
+      <item path="src/utils.c" ex="false" tool="0" flavor2="0">
       </item>
     </conf>
   </confs>

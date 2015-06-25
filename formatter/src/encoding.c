@@ -4,16 +4,77 @@
 #include <string.h>
 #include <limits.h>
 #include <assert.h>
-#include "unicode/utypes.h"
-#include "unicode/ucnv.h"
-#include "unicode/ustring.h"
-#include "unicode/uchar.h"
-#include "unicode/uloc.h"
-#include "unicode/ustring.h"
+#include <unicode/utypes.h>
+#include <unicode/ucnv.h>
+#include <unicode/ustring.h>
+#include <unicode/uchar.h>
+#include <unicode/uloc.h>
+#include <unicode/ustring.h>
+#include "encoding.h"
 #ifdef MEMWATCH
 #include "memwatch.h"
 #endif
 
+/**
+ * Convert a utf8 string to utf16
+ * @param str the source utf8 string
+ * @param len the length og str to process
+ * @return a utf16 string the caller must free
+ */
+UChar *utf8toutf16Len( char *str, int s_len )
+{
+    int u_len = measure_from_encoding( str, s_len, "UTF-8" );
+    UChar *u_str = calloc(u_len+1,sizeof(UChar));
+    if ( u_str != NULL )
+    {
+        int res = convert_from_encoding( str, s_len, u_str, u_len+1, "UTF-8" );
+        if ( res/sizeof(UChar) != u_len )
+            return NULL;
+    }
+    return u_str;
+}
+/**
+ * Convert a utf8 string to utf16
+ * @param str the source utf8 string
+ * @return a utf16 string the caller must free
+ */
+UChar *utf8toutf16( char *str )
+{
+    int s_len = strlen(str);
+    return utf8toutf16Len( str, s_len );
+}
+/**
+ * Convert a utf16 string to utf8
+ * @param str the source utf8 string
+ * @param u_len the length of utf16 str to process; set to utf8 len on exit
+ * @return a utf8 string the caller must free
+ */
+char *utf16toutf8Len( UChar *u_str, int *u_len )
+{
+    int c_len = measure_to_encoding( u_str, *u_len, "UTF-8" );
+    char *c_str = calloc(c_len+1,sizeof(char));
+    if ( c_str != NULL )
+    {
+        int res = convert_to_encoding( u_str, *u_len, c_str, c_len+1, "UTF-8" );
+        if ( res != c_len )
+        {
+            *u_len = 0;
+            return NULL;
+        }
+    }
+    *u_len = c_len;
+    return c_str;
+}
+/**
+ * Convert a utf16 string to utf8
+ * @param str the source utf8 string
+ * @return a utf8 string the caller must free
+ */
+char *utf16toutf8( UChar *str )
+{
+    int u_len = u_strlen(str);
+    return utf16toutf8Len( str, &u_len );
+}
 /**
  * Convert from UTF-16 to another encoding
  * @param src the data read from the file

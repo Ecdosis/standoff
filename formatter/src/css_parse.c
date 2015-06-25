@@ -50,7 +50,7 @@
  * @param rule the rule to fill in with selectors
  * @return 1 if
  */
-static int get_selectors( const UChar *data, int start, int len, css_rule *rule )
+static int get_selectors( const char *data, int start, int len, css_rule *rule )
 {
     int res = 0;
     int i = start;
@@ -82,7 +82,7 @@ static int get_selectors( const UChar *data, int start, int len, css_rule *rule 
  * @param rule the rule to fill out
  * @return 1 if it succeeded, else 0
  */
-static int get_properties( const UChar *data, int len, css_rule *rule )
+static int get_properties( const char *data, int len, css_rule *rule )
 {
     int res = 1,i = 0;
     int end = len;
@@ -111,7 +111,7 @@ static int get_properties( const UChar *data, int len, css_rule *rule )
  * @param offset VAR param of the offset into data to read from
  * @return the rule or NULL
  */
-static css_rule *get_css_rule( const UChar *data, int *offset )
+static css_rule *get_css_rule( const char *data, int *offset )
 {
     int pos = *offset;
     int state = 0;
@@ -183,7 +183,7 @@ static void print_css_rule( void *key )
  * @param css store the css rules in here
  * @return 1 if it succeeded, else 0
  */
-int css_parse( const UChar *data, int len, hashset *props, hashmap *css )
+int css_parse( const  char *data, int len, hashset *props, hashmap *css )
 {
     int offset = 0;
     do
@@ -191,7 +191,7 @@ int css_parse( const UChar *data, int len, hashset *props, hashmap *css )
         css_rule *rule = get_css_rule( data, &offset );
         if ( rule != NULL )
         {
-            UChar *class_name = css_rule_get_class(rule);
+            char *class_name = css_rule_get_class(rule);
             // only put into the css properties seen in the markup
             if ( hashset_contains(props,class_name) )
             {

@@ -26,7 +26,7 @@
 #include "utils.h"
 #include "memwatch.h"
 
-static UChar AESE_PREFIX[] = {'-','a','e','s','e','-'};
+static char *AESE_PREFIX = "-aese-";
 static int AESE_PREFIX_LEN = 6;
 
 /**
@@ -37,11 +37,11 @@ static int AESE_PREFIX_LEN = 6;
 struct css_property_struct
 {
 	/* name of the xml-attribute */
-	UChar *xml_name;
+	char *xml_name;
 	/* if NULL then we only match not replace */
-	UChar *html_name;
+	char *html_name;
     /* property value to be set */
-    UChar *html_value;
+    char *html_value;
 };
 
 /**
@@ -80,21 +80,21 @@ css_property *css_property_clone( css_property *p )
         error( "css_property: failed to duplicate property struct\n");
     if ( p->xml_name != NULL )
     {
-        copy->xml_name = u_strdup(p->xml_name);
+        copy->xml_name = strdup(p->xml_name);
         if ( copy->xml_name == NULL )
             error("css_property: failed to duplicate xml_name "
                 "field during clone\n");
     }
     if ( p->html_name != NULL )
     {
-        copy->html_name = u_strdup(p->html_name);
+        copy->html_name = strdup(p->html_name);
         if ( copy->html_name == NULL )
             error("css_property: failed to duplicate xml_name "
                 "field during clone\n");
     }
     if ( p->html_value != NULL )
     {
-        copy->html_value = u_strdup(p->html_value);
+        copy->html_value = strdup(p->html_value);
         if ( copy->html_value == NULL )
             error("css_property: failed to duplicate html_value "
                 "field during clone\n");
@@ -106,7 +106,7 @@ css_property *css_property_clone( css_property *p )
  * @param p the property in question
  * @return a string being the html attribute name
  */
-UChar *css_property_get_html_name( css_property *p )
+char *css_property_get_html_name( css_property *p )
 {
     return p->html_name;
 }
@@ -115,7 +115,7 @@ UChar *css_property_get_html_name( css_property *p )
  * @param p the property in question
  * @return a string being the xml attribute name
  */
-UChar *css_property_get_xml_name( css_property *p )
+char *css_property_get_xml_name( css_property *p )
 {
     return p->xml_name;
 }/**
@@ -123,7 +123,7 @@ UChar *css_property_get_xml_name( css_property *p )
  * @param p the property in question
  * @return a string being the property value
  */
-UChar *css_property_get_html_value( css_property *p )
+char *css_property_get_html_value( css_property *p )
 {
     return p->html_value;
 }
@@ -132,7 +132,7 @@ UChar *css_property_get_html_value( css_property *p )
  * @param str the string to remove it from
  * @param c the char to remove
  */
-static void strip_char( UChar *str, UChar c )
+static void strip_char( char *str, char c )
 {
     int i = 0;
     int j = 0;
@@ -158,7 +158,7 @@ static void strip_char( UChar *str, UChar c )
  * @param len the length of the property in data
  * @return an allocated css_property (caller must eventually dispose it)
  */
-css_property *css_property_parse( const UChar *data, int len )
+css_property *css_property_parse( const char *data, int len )
 {
     // format: -aese-xml_name: html_name;
     // copy the attribute value over from the xml unchanged (not here)
@@ -171,7 +171,7 @@ css_property *css_property_parse( const UChar *data, int len )
 		start++;
         end--;
     }
-	if ( u_strncmp(&data[start],AESE_PREFIX,AESE_PREFIX_LEN)==0 )
+	if ( strncmp(&data[start],AESE_PREFIX,AESE_PREFIX_LEN)==0 )
     {
         start += AESE_PREFIX_LEN;
         i = start;
@@ -189,10 +189,10 @@ css_property *css_property_parse( const UChar *data, int len )
                 if ( prop_temp != NULL )
                 {
                     int lhs_len = i-start;
-                    prop_temp->xml_name = calloc( lhs_len+1, sizeof(UChar) );
+                    prop_temp->xml_name = calloc( lhs_len+1, sizeof(char) );
                     if ( prop_temp->xml_name != NULL )
                     {
-                        u_strncpy( prop_temp->xml_name, &data[start], lhs_len );
+                        strncpy( prop_temp->xml_name, &data[start], lhs_len );
                         if ( escaped )
                             strip_char(prop_temp->xml_name,'\\');
                         // parse right hand side
@@ -204,10 +204,10 @@ css_property *css_property_parse( const UChar *data, int len )
                         if ( i < end )
                         {
                             int rhs_len = (end-i)+1;
-                            prop_temp->html_name = calloc( rhs_len+1, sizeof(UChar) );
+                            prop_temp->html_name = calloc( rhs_len+1, sizeof(char) );
                             if ( prop_temp->html_name != NULL )
                             {
-                                u_strncpy( prop_temp->html_name, &data[i], rhs_len );
+                                strncpy( prop_temp->html_name, &data[i], rhs_len );
                                 break;
                             }
                             else
@@ -247,9 +247,9 @@ css_property *css_property_parse( const UChar *data, int len )
  * @param p the property in question
  * @param value the value for the HTML attribute
  */
-void css_property_set_html_value( css_property *p, UChar *value )
+void css_property_set_html_value( css_property *p, char *value )
 {
-    p->html_value = u_strdup( value );
+    p->html_value = strdup( value );
     if ( p->html_value == NULL )
         warning( "css_property: failed to duplicate html value\n" );
 }

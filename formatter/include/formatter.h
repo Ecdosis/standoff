@@ -28,19 +28,19 @@
 extern "C" {
 #endif
 
-typedef int (*load_markup_func)(const UChar *data, int len, range_array *ranges,
+typedef int (*load_markup_func)(const char *data, int len, range_array *ranges,
     hashset *props );
 typedef struct
 {
-    UChar *name;
+    char *name;
     load_markup_func lm;
 } format;
 typedef struct formatter_struct formatter;
 formatter *formatter_create( int len );
 void formatter_dispose( formatter *f );
-int formatter_css_parse( formatter *f, const UChar *data, int len );
+int formatter_css_parse( formatter *f, const char *data, int len );
 int formatter_load_markup( formatter *f, load_markup_func mfunc, 
-    const UChar *data, int len );
+    const char *data, int len );
 int formatter_make_html( formatter *f, const UChar *text, int len );
 int formatter_save_html( formatter *f, char *file );
 UChar *formatter_get_html( formatter *f, int *len );

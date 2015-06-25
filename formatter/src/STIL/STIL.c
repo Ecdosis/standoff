@@ -27,6 +27,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <unicode/uchar.h>
+#include <unicode/ustring.h>
 #include "css_property.h"
 #include "css_selector.h"
 #include "hashmap.h"
@@ -43,6 +45,7 @@
 #include "plain_text.h"
 #include "memwatch.h"
 #include "error.h"
+#include "encoding.h"
 
 #ifdef XML_LARGE_SIZE
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
@@ -104,8 +107,7 @@ void stil_parse( cJSON *root, struct userdata_struct *u )
                         while ( sibling != NULL )
                         {
                             annotation *a = annotation_create_simple(
-                                sibling->child->string,
-                                sibling->child->valuestring );
+                                sibling->child->string, sibling->child->valuestring);
                             if ( a != NULL )
                                 range_add_annotation( u->current, a );
                             sibling = sibling->next;

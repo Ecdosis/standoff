@@ -19,7 +19,6 @@
 
 #include "memwatch.h"
 static format stil_format;
-static UChar U_STIL[4] = {'S','T','I','L'};
 static char error_string[128] = "";
 static UChar u_error_string[128];
 struct master_struct
@@ -44,7 +43,7 @@ master *master_create( UChar *text, int len )
     if ( hf != NULL )
     {
         stil_format.lm = load_stil_markup;
-        stil_format.name = U_STIL;
+        stil_format.name = "STIL";
         hf->has_text = 0;
         hf->has_css = 0;
         hf->has_markup = 0;
@@ -80,7 +79,7 @@ void master_dispose( master *hf )
  * @param fmt the format
  * return 1 if successful, else 0
  */
-int master_load_markup( master *hf, const UChar *markup, int mlen )
+int master_load_markup( master *hf, const char *markup, int mlen )
 {
     int res = 0;
     res = formatter_load_markup( hf->f, 
@@ -96,7 +95,7 @@ int master_load_markup( master *hf, const UChar *markup, int mlen )
  * @param len its length
  * return 1 if successful, else 0
  */
-int master_load_css( master *hf, const UChar *css, int len )
+int master_load_css( master *hf, const char *css, int len )
 {
     int res = formatter_css_parse( hf->f, css, len );
     if ( res && !hf->has_css )

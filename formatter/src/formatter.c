@@ -39,8 +39,6 @@
 #include "error.h"
 #include "memwatch.h"
 
-static UChar U_ROOT[] = {'r','o','o','t'};
-
 #define RANGES_BLOCK_SIZE 256
 
 struct formatter_struct
@@ -74,7 +72,7 @@ formatter *formatter_create( int len )
         else
         {
             css_rule *root = css_rule_create();
-            css_selector *sel = css_selector_create( NULL, U_ROOT);
+            css_selector *sel = css_selector_create( NULL, "root");
             if ( root==NULL || sel==NULL || !css_rule_add_selector(root,sel) )
             {
                 warning("could not add root selector to css rules\n");
@@ -82,7 +80,7 @@ formatter *formatter_create( int len )
                 return NULL;
             }
             else
-                hashmap_put( f->css_rules, U_ROOT, root );
+                hashmap_put( f->css_rules, "root", root );
         }
         f->properties = hashset_create();
         if ( f->properties == NULL )
@@ -91,7 +89,7 @@ formatter *formatter_create( int len )
             return NULL;
         }
         else
-            hashset_put( f->properties, U_ROOT );
+            hashset_put( f->properties, "root" );
     }
     else
         warning("formatter: failed to allocate formatter\n");
@@ -112,7 +110,7 @@ void formatter_dispose( formatter *f )
         {
             while ( hashmap_iterator_has_next(iter) )
             {
-                UChar *key = hashmap_iterator_next( iter );
+                char *key = hashmap_iterator_next( iter );
                 css_rule *rule = hashmap_get( f->css_rules, key );
                 css_rule_dispose( rule );
             }
@@ -133,7 +131,7 @@ void formatter_dispose( formatter *f )
  * @param len its length
  * @return 1 if it succeeded, else 0
  */
-int formatter_css_parse( formatter *f, const UChar *data, int len )
+int formatter_css_parse( formatter *f, const char *data, int len )
 {
     return css_parse( data, len, f->properties, f->css_rules );
 }
@@ -146,7 +144,7 @@ int formatter_css_parse( formatter *f, const UChar *data, int len )
  * @return 1 if it succeeded, else 0
  */
 int formatter_load_markup( formatter *f, load_markup_func mfunc, 
-    const UChar *data, int len )
+    const char *data, int len )
 {
     int res = (mfunc)( data, len, f->ranges, f->properties );
     if ( res )
@@ -288,7 +286,7 @@ static UChar *remove_text( range_array *removals, UChar *text, int *len )
 static int formatter_add_root_range( formatter *f, int tlen )
 {
     int res = 1;
-    range *root = range_create( U_ROOT, NULL, 0, tlen );
+    range *root = range_create( "root", NULL, 0, tlen );
     if ( root == NULL )
     {
         fprintf(stderr,"formatter: failed to create document root\n");

@@ -38,10 +38,10 @@
 #include "formatter.h"
 #include "css_parse.h"
 #include "file_list.h"
-#include "AESE/AESE.h"
 #include "STIL/STIL.h"
 #include "error.h"
 #include "master.h"
+#include "encoding.h"
 #include "memwatch.h"
 #ifdef XML_LARGE_SIZE
 #if defined(XML_USE_MSC_EXTENSIONS) && _MSC_VER < 1400
@@ -84,7 +84,6 @@ static void print_help()
 		"Options are: \n"
 		"-h print this help message\n"
 		"-v print the version information\n"
-		"-l list supported formats\n"
 		"-c colon-separated list of css files (required)\n"
 		"-m colon-separated list of markup file names (required)\n"
 		"-t file the name of the base text file (required)\n");
@@ -119,10 +118,6 @@ static int check_args( int argc, char **argv )
 						break;
 					case 'h':
 						print_help();
-						doing_help = 1;
-						break;
-					case 'l':
-						u_printf("%s",master_list());
 						doing_help = 1;
 						break;
 					case 'c':
@@ -178,7 +173,7 @@ static int check_args( int argc, char **argv )
  */
 static void usage()
 {
-	fprintf( stderr,"usage: formatter [-h] [-v] [-l] [-w] -c css "
+	fprintf( stderr,"usage: formatter [-h] [-v] [-w] -c css "
 		"-m markup -t text-file [html-file]\n"
 		"type: \"formatter -h\" for help\n");
 }
@@ -193,17 +188,18 @@ int main( int argc, char **argv )
 	{
 		if ( !doing_help )
 		{
-            UChar *data,*text;
+            UChar *text;
+            char *data;
             int i,len;
-            if ( file_list_load(text_file,0,&text,&len) )
+            if ( file_list_load_utf16(text_file,0,&text,&len) )
             {
                 master *hf = master_create( text, len );
                 for ( i=0;i<file_list_size(markup_files);i++ )
                 {
-                    res = file_list_load(markup_files,i,&data,&len);
+                    res = file_list_load_utf8(markup_files,i,&data,&len);
                     if ( res )
                     {
-                        res = master_load_markup( hf, data, len, format_name );
+                        res = master_load_markup( hf, data, len );
                         free( data );
                         data = NULL;
                     }
@@ -212,7 +208,7 @@ int main( int argc, char **argv )
                 {
                     for ( i=0;i<file_list_size(css_files);i++ )
                     {
-                        res = file_list_load(css_files,i,&data,&len);
+                        res = file_list_load_utf8(css_files,i,&data,&len);
                         if ( res )
                         {
                             res = master_load_css( hf, data, len );
@@ -223,8 +219,14 @@ int main( int argc, char **argv )
                     output = fopen( html_file_name, "w" );
                     if ( output != NULL )
                     {
-                        char *html = master_convert( hf );
-                        fwrite( html, 1, master_get_html_len(hf), output );
+                        UChar *html = master_convert( hf );
+                        int len = master_get_html_len(hf);
+                        char *utf8str = utf16toutf8Len( html, &len );
+                        if ( utf8str != NULL )
+                        {
+                            fwrite( utf8str, 1, len, output );
+                            free( utf8str );
+                        }
                         fclose( output );
                     }
                 }

@@ -32,9 +32,9 @@
 struct css_selector_struct
 {
     /** the html element name */
-	UChar *element;
+	char *element;
     /** the html class name or xml property name */
-	UChar *class;
+	char *class;
 };
 /**
  * Create a css selector manually
@@ -42,14 +42,14 @@ struct css_selector_struct
  * @param xml_name the class name
  * @param kind the rule kind
  */
-css_selector *css_selector_create( UChar *html_name, UChar *xml_name )
+css_selector *css_selector_create( char *html_name, char *xml_name )
 {
     css_selector *s = calloc( 1, sizeof(css_selector) );
     if ( s != NULL )
     {
         if ( html_name != NULL )
-            s->element = u_strdup(html_name);
-        s->class = u_strdup(xml_name);
+            s->element = strdup(html_name);
+        s->class = strdup(xml_name);
         if ( s->class == NULL )
         {
             css_selector_dispose(s);
@@ -93,7 +93,7 @@ css_selector *css_selector_clone( css_selector *s )
     {
         if ( s->element != NULL )
         {
-            copy->element = u_strdup(s->element);
+            copy->element = strdup(s->element);
             if ( copy->element == NULL )
             {
                 warning("css_selector: failed to copy selector element\n" );
@@ -103,7 +103,7 @@ css_selector *css_selector_clone( css_selector *s )
         }
         if ( s->class != NULL )
         {
-            copy->class = u_strdup(s->class);
+            copy->class = strdup(s->class);
             if ( copy->class == NULL )
             {
                 warning("css_selector: failed to copy selector class\n" );
@@ -119,7 +119,7 @@ css_selector *css_selector_clone( css_selector *s )
  * @param s the selector in question
  * @return a string
  */
-UChar *css_selector_get_element( css_selector *s )
+char *css_selector_get_element( css_selector *s )
 {
     return s->element;
 }
@@ -128,7 +128,7 @@ UChar *css_selector_get_element( css_selector *s )
  * @param s the selector in question
  * @return a string
  */
-UChar *css_selector_get_class( css_selector *s )
+char *css_selector_get_class( css_selector *s )
 {
     return s->class;
 }
@@ -140,14 +140,14 @@ UChar *css_selector_get_class( css_selector *s )
  * @param len its length
  * @return the finished selector
  */
-css_selector *css_selector_parse( const UChar *data, int len )
+css_selector *css_selector_parse( const char *data, int len )
 {
 	int i,end = len-1;
     int start = 0;
 	// ignore leading white-space
-	while ( u_isspace(data[start]) )
+	while ( isspace(data[start]) )
 		start++;
-    while ( u_isspace(data[end]) )
+    while ( isspace(data[end]) )
         end--;
 	for ( i=start;i<end;i++ )
 	{
@@ -157,13 +157,13 @@ css_selector *css_selector_parse( const UChar *data, int len )
             if ( sel_temp != NULL )
             {
                 //replaced strndup (unavailable BSD)
-                sel_temp->element = calloc( (i-start)+1,sizeof(UChar) );
+                sel_temp->element = calloc( (i-start)+1,sizeof(char) );
                 if ( sel_temp->element != NULL )
                 {
-					u_strncpy( sel_temp->element, &data[start], i-start );
+					strncpy( sel_temp->element, &data[start], i-start );
                     sel_temp->element[(i-start)] = 0;
                 }
-                sel_temp->class = calloc( (end-i)+1, sizeof(UChar) );
+                sel_temp->class = calloc( (end-i)+1, sizeof(char) );
                 if ( sel_temp->element == NULL || sel_temp->class == NULL )
                 {
                     warning("css_selector: failed to allocate memory for "
@@ -173,7 +173,7 @@ css_selector *css_selector_parse( const UChar *data, int len )
                 }
                 else
                 {
-                    u_strncpy( sel_temp->class, &data[i+1], end-i );
+                    strncpy( sel_temp->class, &data[i+1], end-i );
                     sel_temp->class[end-i] = 0;
                 }
             }

@@ -1,12 +1,30 @@
 if [ $USER = "root" ]; then
+  HASREADLINK=`which readlink`
+  JAVAC=`which javac`
+  getjdkinclude()
+  {
+    if [ -n "$HASREADLINK" ]; then 
+      while [ -h $JAVAC ]
+      do
+        JAVAC=`readlink $JAVAC`
+      done
+      echo `dirname $(dirname $JAVAC)`/$JDKINCLUDEDIRNAME
+    else
+      echo "need readlink. please install."
+    fi
+    return 
+  }
   if [ `uname` = "Darwin" ]; then
     LIBSUFFIX="dylib"
-    JDKINC="/System/Library/Frameworks/JavaVM.framework/Versions/Current/Headers"
+    JDKINCLUDEDIRNAME="Headers"
   else
     LIBSUFFIX="so"
-    JDKINC="/usr/lib/jvm/java-6-openjdk-amd64/include"
+    JDKINCLUDEDIRNAME="include"
   fi
-  gcc -c -DHAVE_EXPAT_CONFIG_H -DHAVE_MEMMOVE -DJNI -I$JDKINC -Iinclude -Iinclude/STIL -Iinclude/AESE -O0 -Wall -g3 -fPIC src/*.c src/AESE/*.c src/STIL/*.c 
+  JDKINC=`getjdkinclude`
+  JDKINCMD="$JDKINC/linux"
+  gcc -c -DHAVE_EXPAT_CONFIG_H -DHAVE_MEMMOVE -DJNI -I$JDKINC -I$JDKINCMD -Iinclude -Iinclude/STIL \
+    -O0 -Wall -g3 -fPIC src/*.c src/STIL/*.c
   gcc *.o -shared -o libAeseFormatter.$LIBSUFFIX
   mv libAeseFormatter.$LIBSUFFIX /usr/local/lib/
   rm *.o

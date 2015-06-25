@@ -11,6 +11,10 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+char *utf16toutf8Len( UChar *str, int *u_len );
+char *utf16toutf8( UChar *str );
+UChar *utf8toutf16( char *str );
+UChar *utf8toutf16Len( char *str, int s_len );
 int convert_from_encoding( char *src, int srclen, UChar *dst, 
     int dstlen, char *charset );
 int convert_to_encoding( UChar *src, int srclen, char *dst, 

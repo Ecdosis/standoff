@@ -40,7 +40,7 @@ struct hashset_struct
 };
 struct hs_bucket
 {
-    UChar *key;
+    char *key;
     int id;
     struct hs_bucket *next;
 };
@@ -49,7 +49,7 @@ struct hs_bucket
  * @param data the data to hash
  * @param len its length
  */
-static unsigned hash( UChar *data, int len )
+static unsigned hash( char *data, int len )
 {
     unsigned a = 1, b = 0;
     int index;
@@ -68,12 +68,12 @@ static unsigned hash( UChar *data, int len )
  * @param id its id
  * @return a finished bucket
  */
-static struct hs_bucket *hs_bucket_create( UChar *prop, int id )
+static struct hs_bucket *hs_bucket_create( char *prop, int id )
 {
     struct hs_bucket *b = calloc( 1, sizeof(struct hs_bucket) );
     if ( b != NULL )
     {
-        b->key = u_strdup( prop );
+        b->key = strdup( prop );
         b->id = id;
     }
     else
@@ -157,7 +157,7 @@ static int hashset_rehash( hashset *hs )
             struct hs_bucket *b = hs->buckets[i];		
             while ( b != NULL )
             {
-                unsigned slot = hash(b->key,u_strlen(b->key))%new_size;
+                unsigned slot = hash(b->key,strlen(b->key))%new_size;
                 struct hs_bucket *d = hs_bucket_create(b->key,b->id);
                 if ( new_buckets[slot] == NULL )
                     new_buckets[slot] = d;
@@ -185,7 +185,7 @@ static int hashset_rehash( hashset *hs )
  * @param prop the property to add
  * @return 1 if successful, else 0
  */
-int hashset_put( hashset *hs, UChar *prop )
+int hashset_put( hashset *hs, char *prop )
 {
     unsigned slot;
     struct hs_bucket *b;
@@ -194,7 +194,7 @@ int hashset_put( hashset *hs, UChar *prop )
         if ( !hashset_rehash(hs) )
             return 0;
     }
-    slot = hash(prop,u_strlen(prop))%hs->num_buckets;
+    slot = hash(prop,strlen(prop))%hs->num_buckets;
     b = hs->buckets[slot];
     if ( b == NULL )
     {
@@ -207,7 +207,7 @@ int hashset_put( hashset *hs, UChar *prop )
         do
         {
             // if key already present, just return
-            if ( u_strcmp(prop,b->key)==0 )
+            if ( strcmp(prop,b->key)==0 )
                 return 0;
             else if ( b->next != NULL )
                 b = b->next;
@@ -227,10 +227,10 @@ int hashset_put( hashset *hs, UChar *prop )
  * @param prop the property to find
  * @return id &gt; 0 if found, else 0
  */
-int hashset_get( hashset *hs, UChar *prop )
+int hashset_get( hashset *hs, char *prop )
 {
     unsigned slot = hash(prop,
-        u_strlen(prop))%(unsigned)hs->num_buckets;
+        strlen(prop))%(unsigned)hs->num_buckets;
     if ( hs->buckets[slot] == NULL )
         return 0;
     else
@@ -238,7 +238,7 @@ int hashset_get( hashset *hs, UChar *prop )
         struct hs_bucket *b = hs->buckets[slot];
         while ( b != NULL )
         {
-            if ( u_strcmp(b->key,prop)==0 )
+            if ( strcmp(b->key,prop)==0 )
                 return b->id;
             b = b->next;
         }
@@ -259,7 +259,7 @@ int hashset_size( hashset *hs )
  * @param hs the hashset in question
  * @param items an array of items big enough
  */
-void hashset_to_array( hashset *hs, UChar **items )
+void hashset_to_array( hashset *hs, char **items )
 {
     int i,j;
     for ( j=0,i=0;i<hs->num_buckets;i++ )
@@ -280,13 +280,13 @@ void hashset_to_array( hashset *hs, UChar **items )
  * @param key the key we seek
  * @return 1 if it was there else 0
  */
-int hashset_contains( hashset *hs, UChar *key )
+int hashset_contains( hashset *hs, char *key )
 {
-    unsigned slot = hash(key,u_strlen(key))%hs->num_buckets;
+    unsigned slot = hash(key,strlen(key))%hs->num_buckets;
     struct hs_bucket *b = hs->buckets[slot];
     while ( b != NULL )
     {
-        if ( u_strcmp(b->key,key)==0 )
+        if ( strcmp(b->key,key)==0 )
             return 1;
         b = b->next;
     }
@@ -304,7 +304,7 @@ void hashset_print( hashset *hs )
         struct hs_bucket *b = hs->buckets[i];
         while ( b != NULL )
         {
-            u_printf( "%s: %d\n",b->key,b->id );
+            printf( "%s: %d\n",b->key,b->id );
             b = b->next;
         }
     }
@@ -315,7 +315,7 @@ int main( int argc, char **argv )
 	hashset *hs = hashset_create();
       if ( hs != NULL )
       {
-           UChar utmp[32];
+           char utmp[32];
            hashset_put( hs, str2ustr("banana",utmp,32) );
            hashset_put( hs, str2ustr("apple",utmp,32) );
            hashset_put( hs, str2ustr("pineapple",utmp,32) );

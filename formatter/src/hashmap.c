@@ -38,7 +38,7 @@ struct hashmap_struct
 };
 struct bucket
 {
-	UChar *key;
+	char *key;
 	void *value;
 	struct bucket *next;
 };
@@ -46,7 +46,7 @@ struct hashmap_iterator_struct
 {
     int position;
     int num_keys;
-    UChar **values;
+    char **values;
 };
 /**
  * Create a new hashmap
@@ -111,7 +111,7 @@ void hashmap_dispose( hashmap *map )
  * @param data the data to hash
  * @param len its length
  */
-static unsigned hash( UChar *data, int len )
+static unsigned hash( char *data, int len )
 {
     unsigned a = 1, b = 0;
     int index;
@@ -130,12 +130,12 @@ static unsigned hash( UChar *data, int len )
  * @param value for the bucket (not our responsibility)
  * @param the bucket or NULL
  */
-static struct bucket *bucket_create( UChar *key, void *value )
+static struct bucket *bucket_create( char *key, void *value )
 {
 	struct bucket *b = calloc( 1, sizeof(struct bucket) );
     if ( b != NULL )
     {
-        b->key = u_strdup(key);
+        b->key = strdup(key);
         if ( b->key == NULL )
         {
             warning("failed to allocate store for hashmap key\n");
@@ -168,7 +168,7 @@ static int hashmap_rehash( hashmap *map )
             struct bucket *b = map->buckets[i];		
             while ( b != NULL )
             {
-                unsigned slot = hash(b->key, u_strlen(b->key))%new_size;
+                unsigned slot = hash(b->key, strlen(b->key))%new_size;
                 struct bucket *d = bucket_create(b->key,b->value);
                 if ( d==NULL )
                     return 0;
@@ -198,15 +198,15 @@ static int hashmap_rehash( hashmap *map )
  * @param key the key to test for
  * @return the value or NULL if not found
  */
-void *hashmap_get( hashmap *map, UChar *key )
+void *hashmap_get( hashmap *map, char *key )
 {
-	unsigned hashval = hash( key, u_strlen(key) );
+	unsigned hashval = hash( key, strlen(key) );
 	int bucket = hashval % map->num_buckets;
 	struct bucket *b = map->buckets[bucket];
 	while ( b != NULL )
 	{
 		// if key already present, just return
-		if ( u_strcmp(key,b->key)==0 )
+		if ( strcmp(key,b->key)==0 )
 			return b->value;
 		else
 			b = b->next;
@@ -220,15 +220,15 @@ void *hashmap_get( hashmap *map, UChar *key )
  * @param key the key to test for
  * @return 1 if present, 0 otherwise
  */
-int hashmap_contains( hashmap *map, UChar *key )
+int hashmap_contains( hashmap *map, char *key )
 {
-	unsigned hashval = hash( key, u_strlen(key) );
+	unsigned hashval = hash( key, strlen(key) );
 	int bucket = hashval % map->num_buckets;
 	struct bucket *b = map->buckets[bucket];
 	while ( b != NULL )
 	{
 		// if key already present, just return
-        if ( u_strcmp(key,b->key)==0 )
+        if ( strcmp(key,b->key)==0 )
 			return 1;
 		else
 			b = b->next;
@@ -247,7 +247,7 @@ int hashmap_contains( hashmap *map, UChar *key )
  * @param replace if 1 then replace any value already in the bucket
  * @return 1 if it was added, 0 otherwise (already there)
  */
-int hashmap_put( hashmap *map, UChar *key, void *value )
+int hashmap_put( hashmap *map, char *key, void *value )
 {
 	unsigned hashval,slot;
     struct bucket *d;
@@ -256,7 +256,7 @@ int hashmap_put( hashmap *map, UChar *key, void *value )
 		if ( !hashmap_rehash(map) )
             return 0;
 	}
-    hashval = hash( key, u_strlen(key) );
+    hashval = hash( key, strlen(key) );
 	slot = hashval % map->num_buckets;
     d = bucket_create( key, value );
     if ( d != NULL )
@@ -272,7 +272,7 @@ int hashmap_put( hashmap *map, UChar *key, void *value )
             struct bucket *c = map->buckets[slot];
             do
             {
-                if ( u_strcmp(c->key,key)==0 )
+                if (strcmp(c->key,key)==0 )
                 {
                     // key already present: replace
                     if ( prev != NULL )
@@ -320,7 +320,7 @@ hashmap_iterator *hashmap_iterator_create( hashmap *map )
     {
         iter->position = 0;
         iter->num_keys = hashmap_size(map);
-        iter->values = (UChar**)calloc( iter->num_keys, sizeof(UChar*) );
+        iter->values = (char**)calloc( iter->num_keys, sizeof(char*) );
         if ( iter->values != NULL )
         {
             int i,k;
@@ -363,7 +363,7 @@ void hashmap_iterator_dispose( hashmap_iterator *iter )
  * Get the next key in the iterator
  * @return a key or NULL
  */
-UChar *hashmap_iterator_next( hashmap_iterator *iter )
+char *hashmap_iterator_next( hashmap_iterator *iter )
 {
     if ( iter->position >= iter->num_keys )
         return NULL;
@@ -391,7 +391,7 @@ void hashmap_print( hashmap *map, print_value pv )
         struct bucket *b = map->buckets[i];
         while ( b != NULL )
         {
-            u_printf("key: %s value: ",b->key);
+            printf("key: %s value: ",b->key);
             (pv)(b->value);
             b = b->next;
         }
@@ -403,15 +403,15 @@ void hashmap_print( hashmap *map, print_value pv )
  * @param key the key to remove
  * @return 1 if it was removed
  */
-int hashmap_remove( hashmap *map, UChar *key )
+int hashmap_remove( hashmap *map, char *key )
 {
-    int hashval = hash( key, u_strlen(key) );
+    int hashval = hash( key, strlen(key) );
 	int slot = hashval % map->num_buckets;
     struct bucket *b = map->buckets[slot];
     struct bucket *prev = NULL;
     while ( b != NULL )
     {
-        if ( u_strcmp(b->key,key)==0 )
+        if ( strcmp(b->key,key)==0 )
         {
             free( b->key );
             b->key = NULL;
