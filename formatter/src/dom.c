@@ -222,7 +222,7 @@ dom *dom_create( const UChar *text, int len, range_array *ranges,
         d->text = text;
         d->text_len = len;
         d->css_rules = rules;
-        p_size = hashset_size(properties);
+         p_size = hashset_size(properties);
         if ( p_size > 0 )
         {
             char **props;

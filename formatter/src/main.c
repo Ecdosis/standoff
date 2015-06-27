@@ -220,7 +220,7 @@ int main( int argc, char **argv )
                     if ( output != NULL )
                     {
                         UChar *html = master_convert( hf );
-                        int len = master_get_html_len(hf);
+                        len = master_get_html_len(hf);
                         char *utf8str = utf16toutf8Len( html, &len );
                         if ( utf8str != NULL )
                         {

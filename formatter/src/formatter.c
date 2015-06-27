@@ -244,7 +244,7 @@ static UChar *remove_text( range_array *removals, UChar *text, int *len )
             if ( prefix_len > 0 )
             {
                 if ( from > to )
-                    memcpy( &text[to], &text[from], prefix_len );
+                    u_strncpy( &text[to], &text[from], prefix_len );
                 to += prefix_len;
             }
             from = range_end( r );

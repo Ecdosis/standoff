@@ -13,6 +13,29 @@
             <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/layer.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/calliope_AeseStripper.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/userdata.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/encoding.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/userdata.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/recipe.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/hh_exceptions.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/encoding.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/dest_file.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/STIL.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/format.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/range.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/utils.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/utils.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/dest_file.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/STIL.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/layer.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/stack.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/include/stack.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/hashmap.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/attribute.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/error.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/hashset.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/log.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/ramfile.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/stripper/src/simplification.c</file>
         </group>
     </open-files>
 </project-private>

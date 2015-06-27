@@ -1,5 +1,30 @@
-A DREAM OF THE ORIENT by Harpur
-A88-copy-1	add0	Version add0
-	base	Version base
-A88	base	Version base
-	add0	Version add0
+h642
+	h642e	Version h642e
+	h642j	Version h642j
+	h642b	Version h642b
+h642c	base	Version base of h642c
+	add1	Version level 2 addition of h642c
+	add0	Version level 1 addition of h642c
+	del1	Version level 2 deletion of h642c
+	del2	Version level 3 deletion of h642c
+h642a	base	Version base of h642a
+	add0	Version level 1 addition of h642a
+	add1	Version level 2 addition of h642a
+	del1	Version level 2 deletion of h642a
+h642f	add0	Version level 1 addition of h642f
+	base	Version base of h642f
+h642d	base	Version base of h642d
+	add1	Version level 2 addition of h642d
+	add0	Version level 1 addition of h642d
+	del1	Version level 2 deletion of h642d
+h642h	add1	Version level 2 addition of h642h
+	add0	Version level 1 addition of h642h
+	del1	Version level 2 deletion of h642h
+	rdg1	Version layer 2 of h642h
+	base	Version base of h642h
+	rdg2	Version layer 3 of h642h
+h642i	add1	Version level 2 addition of h642i
+	add0	Version level 1 addition of h642i
+	base	Version base of h642i
+	del1	Version level 2 deletion of h642i
+
