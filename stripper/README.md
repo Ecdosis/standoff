@@ -30,7 +30,7 @@ libexpat1
 libexpat1-dev
 
 
-### Using the stripper from teh Java program
+### Using the stripper from a Java program
 The stripper is intended to be called from a Java program. The 
 AeseStripper class in calliope.core should be used. There is an 
 example of its use in StageThreeXML.java in the Importer tool:
