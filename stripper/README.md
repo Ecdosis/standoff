@@ -8,13 +8,15 @@ the java.library.path when you launch Java, such as:
 -Djava.library.path=.:/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib:/usr/local/lib 
 
 To find the Java libpath use a trivial Java program like
-public class LibPath
-{
-    public static void main( String[] args )
-    {
-        System.out.print(System.getProperty("java.library.path"));
-    }
-}
+
+>    public class LibPath
+>    {
+>        public static void main( String[] args )
+>        {
+>            System.out.print(System.getProperty("java.library.path"));
+>        }
+>    }
+
 Alternatively, just edit the script to put it in one of the standard 
 directories like /usr/lib.
 
