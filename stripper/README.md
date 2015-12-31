@@ -9,13 +9,13 @@ the java.library.path when you launch Java, such as:
 
 To find the Java libpath use a trivial Java program like
 
->    public class LibPath
->    {
->        public static void main( String[] args )
->        {
->            System.out.print(System.getProperty("java.library.path"));
->        }
->    }
+    public class LibPath
+    {
+        public static void main( String[] args )
+        {
+            System.out.print(System.getProperty("java.library.path"));
+        }
+    }
 
 Alternatively, just edit the script to put it in one of the standard 
 directories like /usr/lib.
