@@ -8,57 +8,57 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/cJSON.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/plain_text.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/STIL.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/range.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/main.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/master.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/encoding.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/master.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/formatter.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/STIL/STIL.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/formatter.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/file_list.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/file_list.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_parse.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_parse.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_property.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_rule.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_selector.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_property.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_rule.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_selector.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/annotation.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/attribute.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/annotation.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/attribute.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/hashmap.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/hashmap.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/utils.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/hashset.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/hashset.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/formatter.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/HTML.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/calliope_AeseFormatter.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/encoding.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/text_buf.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/range.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/matrix_queue.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/matrix_queue.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/matrix.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/matrix.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/node.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/utils.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/memwatch.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/node.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/HTML.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/HTML.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/dom.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/text_buf.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/text_buf.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/encoding.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/jni.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/range_array.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/plain_text.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/file_list.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/matrix.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_rule.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/annotation.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/annotation.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/hashset.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/formatter.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/hashset.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/master.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/file_list.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_property.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/STIL.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/range.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/attribute.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/master.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/matrix_queue.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/utils.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/main.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/node.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/text_buf.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/cJSON.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/encoding.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/hashmap.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/STIL/STIL.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_rule.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/hashmap.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_parse.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_property.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_selector.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/dom.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/memory.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/error.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/memwatch.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/matrix.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/queue.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/utils.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/calliope_AeseFormatter.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/attribute.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_parse.h</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/error.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/jni.c</file>
         </group>
     </open-files>
 </project-private>

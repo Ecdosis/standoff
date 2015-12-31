@@ -1,4 +1,46 @@
-aristofanunculos by capuana
-Frammento 1	add0	Version add0
-	base	Version base
+h689
+	A97-H689i	Version A97-H689i
+	A87-2-H689l	Version A87-2-H689l
+	H689j	Version H689j
+H689a	add1	Version level 2 addition of H689a
+	add0	Version level 1 addition of H689a
+	del8	Version del8 of H689a
+	del9	Version del9 of H689a
+	del6	Version del6 of H689a
+	del7	Version del7 of H689a
+	del4	Version del4 of H689a
+	rdg1	Version layer 2 of H689a
+	base	Version base of H689a
+	del5	Version del5 of H689a
+	del2	Version level 3 deletion of H689a
+	rdg3	Version rdg3 of H689a
+	del3	Version level 4 deletion of H689a
+	rdg2	Version layer 3 of H689a
+	rdg5	Version rdg5 of H689a
+	del1	Version level 2 deletion of H689a
+	rdg4	Version rdg4 of H689a
+	rdg7	Version rdg7 of H689a
+	rdg6	Version rdg6 of H689a
+	rdg9	Version rdg9 of H689a
+	rdg8	Version rdg8 of H689a
+H689c	base	Version base of H689c
+	rdg3	Version rdg3 of H689c
+	rdg2	Version layer 3 of H689c
+	rdg5	Version rdg5 of H689c
+	rdg4	Version rdg4 of H689c
+	rdg6	Version rdg6 of H689c
+	add1	Version level 2 addition of H689c
+	add0	Version level 1 addition of H689c
+	rdg1	Version layer 2 of H689c
+	del4	Version del4 of H689c
+	del3	Version level 4 deletion of H689c
+	del2	Version level 3 deletion of H689c
+	del1	Version level 2 deletion of H689c
+H689d	base	Version base of H689d
+	add0	Version level 1 addition of H689d
+	rdg1	Version layer 2 of H689d
+	rdg2	Version layer 3 of H689d
+	del1	Version level 2 deletion of H689d
+2-H689g	base	Version base of 2-H689g
+	add0	Version level 1 addition of 2-H689g
 

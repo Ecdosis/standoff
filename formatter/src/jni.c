@@ -85,15 +85,19 @@ JNIEXPORT jint JNICALL Java_calliope_AeseFormatter_format
     if ( t_data != NULL && markup != NULL && css != NULL  )
     {
         jboolean isMarkupCopy;
+        //jni_report( "about to call master_create\n" );
         master *hf = master_create( t_data, t_len );
         if ( hf != NULL )
         {
+            //jni_report( "about to get markup array length\n" );
             len = (*env)->GetArrayLength(env, markup);
             for ( i=0;i<len;i++ )
             {
                 res = 1;
+                //jni_report( "about to get markup str\n" );
                 jstring markup_str = (jstring)(*env)->GetObjectArrayElement(
                     env, markup, i );
+                //jni_report( "about to load c string\n" );
                 const char *markup_data = load_string_c(env, markup_str, 
                     &isMarkupCopy);
                 if ( markup_data != NULL )
@@ -128,7 +132,11 @@ JNIEXPORT jint JNICALL Java_calliope_AeseFormatter_format
                     html = master_convert( hf );
                     //jni_report( "finished calling master_convert\n" );
                     if ( html != NULL )
+                    {
                         res = set_string_field( env, jsonHtml, "body", html );
+                        if ( res == 0 )
+                            jni_report("set string failed tried to write %d chars\n",u_strlen(html));
+                    }
                 }
             }
             master_dispose( hf );
