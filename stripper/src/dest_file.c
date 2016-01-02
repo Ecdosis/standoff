@@ -6,12 +6,12 @@
 #include "milestone.h"
 #include "layer.h"
 #ifdef JNI
+#include "log.h"
 #include "ramfile.h"
 #endif
 #include "range.h"
 #include "dest_file.h"
 #include "format.h"
-#include "log.h"
 #include "hashmap.h"
 #include "encoding.h"
 #include "memwatch.h"

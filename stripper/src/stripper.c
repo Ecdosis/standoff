@@ -33,6 +33,7 @@
 #include <jni.h>
 #include "calliope_AeseStripper.h"
 #include "ramfile.h"
+#include "log.h"
 #endif
 #include "milestone.h"
 #include "layer.h"
@@ -48,7 +49,6 @@
 #include "simplification.h"
 #include "recipe.h"
 #include "hashmap.h"
-#include "log.h"
 #include "hh_exceptions.h"
 #include "userdata.h"
 #include "utils.h"
