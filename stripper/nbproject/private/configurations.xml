@@ -26,9 +26,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r html.css</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r html.css -f STIL -s html</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" slider.html -r recipe-html.json -f STIL -s html</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -r recipe-html.json -f STIL -s html slider.html </runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -r recipe-html.json -f STIL -s html slider.html</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" A89#h642</runcommandpicklistitem>
@@ -36,8 +33,11 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" il-drago-tei-base.xml</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -l it il-drago-tei-base.xml</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -l it -r recipe.json il-drago-tei-base.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>-l en EMP#h622a.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -l it -r recipe.json BUSHRANGERS#h080f.xml</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -l en -r recipe.json EMP#h622a.xml</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" -l it -r recipe.json il-drago-tei-base.xml</runcommand>
+        <runcommand>"${OUTPUT_PATH}" -l en -r recipe.json EMP#h622a.xml</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

@@ -26,9 +26,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -c default.css -m il-drago-tei-stil.json -t il-drago-tei-base.txt</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -c default.css -m il-drago-tei-base-stil.json -t il-drago-tei-base.txt</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -c table.css -m table-stil.json -t table.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c h642.css:h642-diffs.css -m h642-stil.json:h642-diffs.json -t h642.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c list.css -m list.stil -t list.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c h689-a.css;h689-b.css -m h689-stil-a.json;h689-stil-b.json -t h689.txt</runcommandpicklistitem>
@@ -36,8 +33,11 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c styleTexts1.css:styleTExts2.css -m ccTexts1.json:ccTexts2.json -t mvdString.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c styleTexts1.css:styleTexts2.css -m ccTexts1.json:ccTexts2.json -t mvdString.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c default.css -m conrad-stil.json -t conrad.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c default.css -m conrad-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622a-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" -c default.css -m conrad-stil.json -t conrad.txt</runcommand>
+        <runcommand>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622a-stil.json -t EMP#h622a.txt</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

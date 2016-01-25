@@ -453,7 +453,7 @@ static XML_Char *combine_words( XML_Char *w1, XML_Char *w2 )
     XML_Char *w3 = calloc( strlen(w1)+strlen(w2)+1,1 );
     if ( w3 != NULL )
     {
-        strcpy( w3,w1 );
+        strcpy( w3, w1 );
         strcat( w3, w2 );
     }
     return w3;
@@ -497,7 +497,7 @@ static void process_hyphen( userdata *u, XML_Char *text, int len )
                 { 
                     dest_file *df = userdata_get_markup_dest( u, u_force );
                     userdata_set_hyphen_state(u,HYPHEN_NONE);
-                    range_set_len( r, 1 );
+                    range_set_len( r, 2 );  // hyphen+LF
                     dest_file_enqueue( df, r );
                 }
                 free( u_force );
@@ -542,7 +542,7 @@ static void XMLCALL charhndl( void *userData, const XML_Char *s, int len )
                 && userdata_hyphen_state(u)==HYPHEN_ONLY )
             {
                 userdata_set_hyphen_state(u,HYPHEN_LF);
-                len=0;
+                len=1;
             }
             if ( len > 0 )
             {
