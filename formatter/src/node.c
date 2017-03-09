@@ -101,6 +101,21 @@ void node_dispose( node *n )
     free( n );
 }
 /**
+ * Does this node represent a divider?
+ * @param n the node in question
+ * @return 1 if it is a divider
+ */
+int node_is_divider( node *n )
+{
+    if ( n->len <= 2 )
+    {
+        char *pos = strstr(n->name,"divider-");
+        return pos == n->name && strcmp(n->html_name,"table")==0;
+    }
+    else
+        return 0;
+}
+/**
  * Is this node already placed in the tree?
  * @param n the node to test
  * @return 1 if it has a parent else 0
@@ -341,6 +356,15 @@ int node_len( node *n )
 int node_end( node *n )
 {
     return n->offset+n->len;
+}
+/**
+ * Force the node to have a particular length
+ * @param n the node
+ * @param len the new length
+ */
+void node_set_len( node *n, int len )
+{
+    n->len = len;
 }
 /**
  * Split a node into two sibling nodes

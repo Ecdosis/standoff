@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="97">
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -13,8 +13,6 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
-        <gdb_signals>
-        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -26,8 +24,6 @@
       </nativedebugger>
       <runprofile version="9">
         <runcommandpicklist>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -c h642.css:h642-diffs.css -m h642-stil.json:h642-diffs.json -t h642.txt</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" -c list.css -m list.stil -t list.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c h689-a.css;h689-b.css -m h689-stil-a.json;h689-stil-b.json -t h689.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c h689-a.css:h689-b.css -m h689-stil-a.json:h689-stil-b.json -t h689.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c styleTexts1.css:styleTExts2.css -m ccTexts1.json:ccTexts2.json -t mvdString.txt</runcommandpicklistitem>
@@ -36,8 +32,10 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c default.css -m conrad-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622a-stil.json -t EMP#h622a.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c corform.css -m corcode1.json:corcode2.json -t letter.txt</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" -c harpur-corform.css:diffs-corform.css -m h034-default.json:h034-diffs.json:h034-pages.json -t h034.txt</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" -c harpur-default.css -m EMP#h622a-stil.json -t EMP#h622a.txt</runcommand>
+        <runcommand>"${OUTPUT_PATH}" -c harpur-corform.css:diffs-corform.css -m h034-default.json:h034-diffs.json:h034-pages.json -t h034.txt</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

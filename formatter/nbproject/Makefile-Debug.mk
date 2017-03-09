@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -41,6 +41,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/STIL/memory.o \
 	${OBJECTDIR}/src/annotation.o \
 	${OBJECTDIR}/src/attribute.o \
+	${OBJECTDIR}/src/bigint.o \
 	${OBJECTDIR}/src/css_parse.o \
 	${OBJECTDIR}/src/css_property.o \
 	${OBJECTDIR}/src/css_rule.o \
@@ -53,6 +54,7 @@ OBJECTFILES= \
 	${OBJECTDIR}/src/hashmap.o \
 	${OBJECTDIR}/src/hashset.o \
 	${OBJECTDIR}/src/jni.o \
+	${OBJECTDIR}/src/log.o \
 	${OBJECTDIR}/src/main.o \
 	${OBJECTDIR}/src/master.o \
 	${OBJECTDIR}/src/matrix.o \
@@ -97,147 +99,157 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/formatter: ${OBJECTFILES}
 ${OBJECTDIR}/src/HTML.o: src/HTML.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/HTML.o src/HTML.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/HTML.o src/HTML.c
 
 ${OBJECTDIR}/src/STIL/STIL.o: src/STIL/STIL.c 
 	${MKDIR} -p ${OBJECTDIR}/src/STIL
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/STIL.o src/STIL/STIL.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/STIL.o src/STIL/STIL.c
 
 ${OBJECTDIR}/src/STIL/cJSON.o: src/STIL/cJSON.c 
 	${MKDIR} -p ${OBJECTDIR}/src/STIL
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/cJSON.o src/STIL/cJSON.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/cJSON.o src/STIL/cJSON.c
 
 ${OBJECTDIR}/src/STIL/memory.o: src/STIL/memory.c 
 	${MKDIR} -p ${OBJECTDIR}/src/STIL
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/memory.o src/STIL/memory.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/STIL/memory.o src/STIL/memory.c
 
 ${OBJECTDIR}/src/annotation.o: src/annotation.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/annotation.o src/annotation.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/annotation.o src/annotation.c
 
 ${OBJECTDIR}/src/attribute.o: src/attribute.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/attribute.o src/attribute.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/attribute.o src/attribute.c
+
+${OBJECTDIR}/src/bigint.o: src/bigint.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/bigint.o src/bigint.c
 
 ${OBJECTDIR}/src/css_parse.o: src/css_parse.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_parse.o src/css_parse.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_parse.o src/css_parse.c
 
 ${OBJECTDIR}/src/css_property.o: src/css_property.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_property.o src/css_property.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_property.o src/css_property.c
 
 ${OBJECTDIR}/src/css_rule.o: src/css_rule.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_rule.o src/css_rule.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_rule.o src/css_rule.c
 
 ${OBJECTDIR}/src/css_selector.o: src/css_selector.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_selector.o src/css_selector.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/css_selector.o src/css_selector.c
 
 ${OBJECTDIR}/src/dom.o: src/dom.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/dom.o src/dom.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/dom.o src/dom.c
 
 ${OBJECTDIR}/src/encoding.o: src/encoding.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/encoding.o src/encoding.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/encoding.o src/encoding.c
 
 ${OBJECTDIR}/src/error.o: src/error.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/error.o src/error.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/error.o src/error.c
 
 ${OBJECTDIR}/src/file_list.o: src/file_list.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/file_list.o src/file_list.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/file_list.o src/file_list.c
 
 ${OBJECTDIR}/src/formatter.o: src/formatter.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/formatter.o src/formatter.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/formatter.o src/formatter.c
 
 ${OBJECTDIR}/src/hashmap.o: src/hashmap.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashmap.o src/hashmap.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashmap.o src/hashmap.c
 
 ${OBJECTDIR}/src/hashset.o: src/hashset.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashset.o src/hashset.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/hashset.o src/hashset.c
 
 ${OBJECTDIR}/src/jni.o: src/jni.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/jni.o src/jni.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/jni.o src/jni.c
+
+${OBJECTDIR}/src/log.o: src/log.c 
+	${MKDIR} -p ${OBJECTDIR}/src
+	${RM} "$@.d"
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/log.o src/log.c
 
 ${OBJECTDIR}/src/main.o: src/main.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/main.o src/main.c
 
 ${OBJECTDIR}/src/master.o: src/master.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/master.o src/master.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/master.o src/master.c
 
 ${OBJECTDIR}/src/matrix.o: src/matrix.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/matrix.o src/matrix.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/matrix.o src/matrix.c
 
 ${OBJECTDIR}/src/matrix_queue.o: src/matrix_queue.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/matrix_queue.o src/matrix_queue.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/matrix_queue.o src/matrix_queue.c
 
 ${OBJECTDIR}/src/memwatch.o: src/memwatch.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memwatch.o src/memwatch.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/memwatch.o src/memwatch.c
 
 ${OBJECTDIR}/src/node.o: src/node.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/node.o src/node.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/node.o src/node.c
 
 ${OBJECTDIR}/src/queue.o: src/queue.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/queue.o src/queue.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/queue.o src/queue.c
 
 ${OBJECTDIR}/src/range.o: src/range.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/range.o src/range.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/range.o src/range.c
 
 ${OBJECTDIR}/src/range_array.o: src/range_array.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/range_array.o src/range_array.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/range_array.o src/range_array.c
 
 ${OBJECTDIR}/src/text_buf.o: src/text_buf.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text_buf.o src/text_buf.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/text_buf.o src/text_buf.c
 
 ${OBJECTDIR}/src/utils.o: src/utils.c 
 	${MKDIR} -p ${OBJECTDIR}/src
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-7-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utils.o src/utils.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -Iinclude/STIL -I/usr/lib/jvm/java-8-openjdk-amd64/include -I/usr/lib/jvm/java-8-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/src/utils.o src/utils.c
 
 # Subprojects
 .build-subprojects:

@@ -32,7 +32,8 @@ static int AESE_PREFIX_LEN = 6;
 /**
  * A css property is a property like font-weight: bold. Except that we
  * extend it by prefixing "-aese-xmlname: htmlname. This is for copying 
- * over attributes from XML to HTML.
+ * over attributes from XML to HTML. We also extend it by optional levels
+ * which provide hints for nesting of html elements.
  */
 struct css_property_struct
 {
@@ -42,6 +43,8 @@ struct css_property_struct
 	char *html_name;
     /* property value to be set */
     char *html_value;
+    /* levelifset else 0 */
+    int level;
 };
 
 /**
@@ -99,7 +102,18 @@ css_property *css_property_clone( css_property *p )
             error("css_property: failed to duplicate html_value "
                 "field during clone\n");
     }
+    if ( copy != NULL )
+        copy->level = p->level;
     return copy;
+}
+/**
+ * Get the property's level
+ * @param pthe property object
+ * @return 0 by default else the specified level
+ */ 
+int css_property_get_level( css_property *p )
+{
+    return p->level;
 }
 /**
  * Get the property's html name
@@ -118,7 +132,8 @@ char *css_property_get_html_name( css_property *p )
 char *css_property_get_xml_name( css_property *p )
 {
     return p->xml_name;
-}/**
+}
+/**
  * Get the html property value
  * @param p the property in question
  * @return a string being the property value
@@ -153,7 +168,8 @@ static void strip_char( char *str, char c )
  * not beginning with "-aese-". Such properties specify
  * the xml attribute name and its corresponding html name. The attribute
  * value is the same in both cases. Such properties are supposed to be
- * ignored by browser-based css parsers
+ * ignored by browser-based css parsers. Except aese properties called "level"
+ * specify the level.
  * @param data the raw CSS data read from the file
  * @param len the length of the property in data
  * @return an allocated css_property (caller must eventually dispose it)
@@ -189,12 +205,8 @@ css_property *css_property_parse( const char *data, int len )
                 if ( prop_temp != NULL )
                 {
                     int lhs_len = i-start;
-                    prop_temp->xml_name = calloc( lhs_len+1, sizeof(char) );
-                    if ( prop_temp->xml_name != NULL )
+                    if ( strncmp(&data[start],"level",lhs_len)==0 )
                     {
-                        strncpy( prop_temp->xml_name, &data[start], lhs_len );
-                        if ( escaped )
-                            strip_char(prop_temp->xml_name,'\\');
                         // parse right hand side
                         i++;
                         while ( i<end && isspace(data[i]) )
@@ -203,33 +215,60 @@ css_property *css_property_parse( const char *data, int len )
                             end--;
                         if ( i < end )
                         {
-                            int rhs_len = (end-i)+1;
-                            prop_temp->html_name = calloc( rhs_len+1, sizeof(char) );
-                            if ( prop_temp->html_name != NULL )
+                            int rhs_len = end-i;
+                            char *tmp = calloc( rhs_len+1, sizeof(char) );
+                            if ( tmp != NULL )
                             {
-                                strncpy( prop_temp->html_name, &data[i], rhs_len );
-                                break;
+                                strncpy( tmp, &data[i], rhs_len );
+                                prop_temp->level = atoi(&data[i]);
+                                free( tmp );
+                            }
+                        }
+                    }
+                    else
+                    {
+                        prop_temp->xml_name = calloc( lhs_len+1, sizeof(char) );
+                        if ( prop_temp->xml_name != NULL )
+                        {
+                            strncpy( prop_temp->xml_name, &data[start], lhs_len );
+                            if ( escaped )
+                                strip_char(prop_temp->xml_name,'\\');
+                            // parse right hand side
+                            i++;
+                            while ( i<end && isspace(data[i]) )
+                                i++;
+                            while ( end>i && isspace(data[end]) )
+                                end--;
+                            if ( i < end )
+                            {
+                                int rhs_len = (end-i)+1;
+                                prop_temp->html_name = calloc( rhs_len+1, sizeof(char) );
+                                if ( prop_temp->html_name != NULL )
+                                {
+                                    strncpy( prop_temp->html_name, &data[i], rhs_len );
+                                    break;
+                                }
+                                else
+                                {
+                                    css_property_dispose( prop_temp );
+                                    warning("css_property: failed to allocate"
+                                        "html name\n");
+                                    prop_temp = NULL;
+                                }
                             }
                             else
                             {
+                                warning("css_property: missing html name\n");
                                 css_property_dispose( prop_temp );
-                                warning("css_property: failed to allocate"
-                                    "html name\n");
                                 prop_temp = NULL;
                             }
                         }
                         else
                         {
-                            warning("css_property: missing html name\n");
                             css_property_dispose( prop_temp );
+                            warning( "css_property: failed to allocate xml_name\n");
                             prop_temp = NULL;
                         }
-                    }
-                    else
-                    {
-                        css_property_dispose( prop_temp );
-                        warning( "css_property: failed to allocate xml_name\n");
-                        prop_temp = NULL;
                     }
                 }
                 else

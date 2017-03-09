@@ -10,6 +10,7 @@
 
 typedef struct css_property_struct css_property;
 void css_property_dispose( css_property *p );
+int css_property_get_level( css_property *p );
 css_property *css_property_clone( css_property *p );
 char *css_property_get_html_name( css_property *p );
 char *css_property_get_xml_name( css_property *p );

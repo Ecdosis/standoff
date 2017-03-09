@@ -1,8 +1,24 @@
-div.source { font-style: italic }
-    p.p {}
-    h3.head {}
-    h4.title {}
-    div.lg { padding-bottom: 10px }
-    p.l { line-height: 100% }
-    p.final-line { text-indent: 50px; line-height: 100% }
-    p.note { font-style: italic }
+span.page{display:none;white-space:normal}
+p.right-indent-1{text-align:right;padding-right:25px;margin-top:0px;margin-bottom:0px;white-space:pre}
+p.right-indent-2{text-align:right;padding-right:50px;margin-top:0px;margin-bottom:0px;white-space:pre}
+p.right-indent-3{text-align:right;padding-right:75px;margin-top:0px;margin-bottom:0px;white-space:pre}
+p.left-indent-1{text-indent:0px;margin-top:0px;margin-bottom:0px}
+p.p{text-indent:20px;margin-top:10px;margin-bottom:10px;white-space:pre;}
+p.addressee{margin-left:0;margin-top:.5em;margin-bottom:.5em}
+h3.head{font-size:large}
+div.ps{margin-top:1em;margin-bottom:1em;font-style:italic}
+span.sic{color:grey}
+span.soft-hyphen{display:none}
+span.hard-hyphen{display:inline}
+span.unclear{font:monospace}
+span.underlined{text-decoration:underline}
+.line,.line-indent1,.line-indent2,.line-final{background-color:transparent;margin-top:0px;margin-bottom:0px;padding:0px;font-family:inherit;font-size:inherit;border:0;line-height:inherit}
+pre.line{margin-left:20px}
+pre.line-indent1{margin-left:40px}
+pre.line-indent2{margin-left:60px}
+pre.line-final{margin-left:80px}
+td.divider-single-lefttop{border-left:0px;background-color:white;border-image-width:0px;border-bottom-width:1px;border-bottom-style:solid;width:70px;height:5px}
+td.divider-single-righttop{border-left:0px;background-color:white;border-image-width:0px;border-bottom-width:1px;border-bottom-style:solid;width:70px;height:5px}
+td.divider-single-leftbot{border-left:0px;background-color:white;border-image-width:0px;width:70px;height:5px}
+td.divider-single-rightbot{border-left:0px;background-color:white;border-image-width:0px;width:70px;height:5px}
+table.divider-single{width:140px;border-collapse:collapse;border-spacing:0;margin-left:auto;margin-right:auto}

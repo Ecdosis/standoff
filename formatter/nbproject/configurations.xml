@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configurationDescriptor version="95">
+<configurationDescriptor version="97">
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
@@ -12,6 +12,7 @@
       <itemPath>include/HTML.h</itemPath>
       <itemPath>include/annotation.h</itemPath>
       <itemPath>include/attribute.h</itemPath>
+      <itemPath>include/bigint.h</itemPath>
       <itemPath>include/calliope_AeseFormatter.h</itemPath>
       <itemPath>include/css_parse.h</itemPath>
       <itemPath>include/css_property.h</itemPath>
@@ -24,6 +25,7 @@
       <itemPath>include/formatter.h</itemPath>
       <itemPath>include/hashmap.h</itemPath>
       <itemPath>include/hashset.h</itemPath>
+      <itemPath>include/log.h</itemPath>
       <itemPath>include/master.h</itemPath>
       <itemPath>include/matrix.h</itemPath>
       <itemPath>include/matrix_queue.h</itemPath>
@@ -52,6 +54,7 @@
       <itemPath>src/HTML.c</itemPath>
       <itemPath>src/annotation.c</itemPath>
       <itemPath>src/attribute.c</itemPath>
+      <itemPath>src/bigint.c</itemPath>
       <itemPath>src/css_parse.c</itemPath>
       <itemPath>src/css_property.c</itemPath>
       <itemPath>src/css_rule.c</itemPath>
@@ -64,6 +67,7 @@
       <itemPath>src/hashmap.c</itemPath>
       <itemPath>src/hashset.c</itemPath>
       <itemPath>src/jni.c</itemPath>
+      <itemPath>src/log.c</itemPath>
       <itemPath>src/main.c</itemPath>
       <itemPath>src/master.c</itemPath>
       <itemPath>src/matrix.c</itemPath>
@@ -101,11 +105,12 @@
           <incDir>
             <pElem>include</pElem>
             <pElem>include/STIL</pElem>
-            <pElem>/usr/lib/jvm/java-7-openjdk-amd64/include</pElem>
-            <pElem>/usr/lib/jvm/java-7-openjdk-amd64/include/linux</pElem>
+            <pElem>/usr/lib/jvm/java-8-openjdk-amd64/include</pElem>
+            <pElem>/usr/lib/jvm/java-8-openjdk-amd64/include/linux</pElem>
           </incDir>
           <preprocessorList>
             <Elem>COMMANDLINE</Elem>
+            <Elem>MEMWATCH</Elem>
           </preprocessorList>
         </cTool>
         <ccTool>
@@ -137,6 +142,8 @@
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/bigint.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/calliope_AeseFormatter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/css_parse.h" ex="false" tool="3" flavor2="0">
@@ -160,6 +167,8 @@
       <item path="include/hashmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/hashset.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/log.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/master.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -197,6 +206,8 @@
       </item>
       <item path="src/attribute.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/bigint.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/css_parse.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/css_property.c" ex="false" tool="0" flavor2="0">
@@ -220,6 +231,8 @@
       <item path="src/hashset.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/jni.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/log.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
       </item>
@@ -276,6 +289,8 @@
       </item>
       <item path="include/attribute.h" ex="false" tool="3" flavor2="0">
       </item>
+      <item path="include/bigint.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="include/calliope_AeseFormatter.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/css_parse.h" ex="false" tool="3" flavor2="0">
@@ -299,6 +314,8 @@
       <item path="include/hashmap.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/hashset.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="include/log.h" ex="false" tool="3" flavor2="0">
       </item>
       <item path="include/master.h" ex="false" tool="3" flavor2="0">
       </item>
@@ -336,6 +353,8 @@
       </item>
       <item path="src/attribute.c" ex="false" tool="0" flavor2="0">
       </item>
+      <item path="src/bigint.c" ex="false" tool="0" flavor2="0">
+      </item>
       <item path="src/css_parse.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/css_property.c" ex="false" tool="0" flavor2="0">
@@ -359,6 +378,8 @@
       <item path="src/hashset.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/jni.c" ex="false" tool="0" flavor2="0">
+      </item>
+      <item path="src/log.c" ex="false" tool="0" flavor2="0">
       </item>
       <item path="src/main.c" ex="false" tool="0" flavor2="0">
       </item>

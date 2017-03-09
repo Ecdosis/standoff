@@ -34,6 +34,7 @@ char *css_rule_get_element( css_rule *rule );
 char *css_rule_get_class( css_rule *rule );
 css_property *css_rule_get_property( css_rule *r, char *xml_name );
 css_property *css_rule_get_property_by_index( css_rule *r, int index );
+int css_rule_get_level( css_rule *r );
 void css_rule_print( css_rule *rule );
 int css_rule_compare( void *key1, void *key2 );
 int css_rule_get_num_properties( css_rule *r );

@@ -43,6 +43,8 @@ struct css_rule_struct
 	int num_properties;
 	/* index into selectors of chosen selector */
 	int index;
+    /** level of this rule from its highest level property */
+    int level;
 };
 /**
  * Create a css rule.
@@ -70,6 +72,15 @@ void css_rule_dispose( css_rule *rule )
 	if ( rule->properties != NULL )
         free( rule->properties );
 	free( rule );
+}
+/**
+ * Get the priority for enclosing other properties at the same HTML level
+ * @param r the css_rule
+ * @return an int
+ */
+int css_rule_get_level( css_rule *r )
+{
+    return r->level;
 }
 /**
  * Clone a css rule
@@ -130,6 +141,10 @@ int css_rule_add_property( css_rule *rule, css_property *prop )
         new_props[rule->num_properties] = prop;
         rule->num_properties++;
         rule->properties = new_props;
+        /* update level */
+        int level = css_property_get_level(prop) ;
+        if ( level > 0 && level > rule->level )
+            rule->level = css_property_get_level(prop);
         res = 1;
     }
     else

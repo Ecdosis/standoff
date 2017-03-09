@@ -271,6 +271,7 @@ dom *dom_create( const UChar *text, int len, range_array *ranges,
                         range_array_sort( d->ranges );
                         matrix_init( d->pm, d->ranges );
                         matrix_update_html( d->pm );
+                        matrix_update_level( d->pm, d->css_rules );
                     }
                 }
                 else
@@ -316,6 +317,7 @@ static void dom_dispose_node( node *n )
  */
 void dom_dispose( dom *d )
 {
+    /*attribute_print_trails();*/
     if ( d->ranges != NULL )
         range_array_dispose( d->ranges, 1 );
     if ( d->root != NULL )
@@ -342,16 +344,23 @@ int dom_build( dom *d )
         node *r = dom_range_to_node( d, rx );
         if ( r != NULL )
         {
-            if ( node_end(r) <= d->text_len )
-                dom_add_node( d, d->root, r );
-            else
+            if ( node_offset(r) > d->text_len )
             {
-                fprintf(stderr,"node range %d:%d > text length (%d)\n",
-                    node_offset(r),node_end(r), d->text_len );
+                // just drop it
+                fprintf(stderr,
+                    "dropping node %s offset %d len %d greater than text %d\n",
+                        node_name(r),node_offset(r),node_len(r),d->text_len
+                    );
                 node_dispose( r );
-                res = 0;
-                break;
+                //res = 0;
             }
+            else if ( node_end(r) > d->text_len )
+            {
+                // curtail
+                node_set_len(r, d->text_len-node_offset(r) );
+            }
+            else
+                dom_add_node( d, d->root, r );
         }
     }
     //matrix_dump( d->pm );
@@ -396,45 +405,71 @@ static void dom_print_text( dom *d, int offset, int len )
         warning("dom: failed to allocate string for printing\n");
 }
 /**
+ * Print a divider node
+ * @param d the dom
+ * @param n a genuine divider node 
+ */
+static void dom_print_divider( dom *d, node *n )
+{
+    char *prop = node_name(n);
+    int plen = strlen(prop);
+    // do it in stages because dom_print can only do 128 bytes at a time
+    dom_concat( d, "<table class=\"%s\" title=\"%s\">",plen*2+25,prop,prop);
+    dom_concat( d, "<tr><td class=\"%s-lefttop\"></td>",plen+30,prop);
+    dom_concat( d, "<td class=\"%s-righttop\"></td></tr>",plen+32,prop);
+    dom_concat( d, "<tr><td class=\"%s-leftbot\"></td>",plen+30,prop);
+    dom_concat( d, "<td class=\"%s-rightbot\"></td></tr></table>", plen+40,prop);
+    // echo any conetn to output also (usually just NL))
+    int start = node_offset(n);
+    int end = node_end(n);
+    if ( end > start )
+        dom_print_text( d, start, end-start );
+}
+/**
  * Print a single node and its children, siblings
  * @param d the dom in question
  * @param n the node to print
  */
 static void dom_print_node( dom *d, node *n )
 {
-	node *c;
-    int start,end;
-    char *html_name = node_html_name(n);
-    char *class_name = node_name(n);
-    char attrs[128];
-    node_get_attributes( n, attrs, 128 );
-    if ( !node_empty(n) )
+	if ( node_is_divider(n) )
+        dom_print_divider(d,n);
+    else
     {
-        if ( !node_is_root(n) )
-            dom_concat( d, "<%s%s class=\"%s\">", strlen(html_name)
-                +strlen(class_name)+strlen(attrs)+11, html_name, 
-                attrs, class_name );
-    }
-    c = node_first_child(n);
-    start = node_offset(n);
-    end = node_end(n);
-    while ( c != NULL )
-    {
-        int pos = node_offset( c );
-        if ( pos > start )
-            dom_print_text( d, start, pos-start );
-        dom_print_node( d, c );
-        start = node_end( c );
-        c = node_next_sibling( c );
-    }
-    if ( end > start )
-        dom_print_text( d, start, end-start );
-    if ( !node_is_root(n) )
-    {
+        node *c;
+        int start,end;
+        char *html_name = node_html_name(n);
+        char *class_name = node_name(n);
+        char attrs[128];
+        node_get_attributes( n, attrs, 128 );
         if ( !node_empty(n) )
-            dom_concat(d, "</%s>",strlen(html_name)+3, html_name);
-        else if ( node_rightmost(n) )
-            dom_concat(d,"<%s>",strlen(html_name)+2,html_name);
+        {
+            if ( !node_is_root(n) )
+                dom_concat( d, "<%s%s class=\"%s\">", strlen(html_name)
+                    +strlen(class_name)+strlen(attrs)+11, html_name, 
+                    attrs, class_name );
+        }
+        c = node_first_child(n);
+        start = node_offset(n);
+        end = node_end(n);
+        while ( c != NULL )
+        {
+            int pos = node_offset( c );
+            if ( pos > start )
+                dom_print_text( d, start, pos-start );
+            dom_print_node( d, c );
+            start = node_end( c );
+            c = node_next_sibling( c );
+        }
+        if ( end > start )
+            dom_print_text( d, start, end-start );
+        if ( !node_is_root(n) )
+        {
+            if ( !node_empty(n) )
+                dom_concat(d, "</%s>",strlen(html_name)+3, html_name);
+            else if ( node_rightmost(n) )
+                dom_concat(d,"<%s>",strlen(html_name)+2,html_name);
+        }
     }
 }
 /**

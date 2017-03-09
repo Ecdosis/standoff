@@ -21,7 +21,7 @@ FC=gfortran
 AS=as
 
 # Macros
-CND_PLATFORM=GNU-Linux-x86
+CND_PLATFORM=GNU-Linux
 CND_DLIB_EXT=so
 CND_CONF=Debug
 CND_DISTDIR=dist
@@ -35,8 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/_ext/1858218211/cJSON.o \
-	${OBJECTDIR}/_ext/1078767344/memwatch.o \
+	${OBJECTDIR}/_ext/6ec228e3/cJSON.o \
+	${OBJECTDIR}/_ext/bfb35110/memwatch.o \
 	${OBJECTDIR}/src/STIL.o \
 	${OBJECTDIR}/src/attribute.o \
 	${OBJECTDIR}/src/dest_file.o \
@@ -86,15 +86,15 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/stripper: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.c} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/stripper ${OBJECTFILES} ${LDLIBSOPTIONS}
 
-${OBJECTDIR}/_ext/1858218211/cJSON.o: ../formatter/src/STIL/cJSON.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1858218211
+${OBJECTDIR}/_ext/6ec228e3/cJSON.o: ../formatter/src/STIL/cJSON.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/6ec228e3
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1858218211/cJSON.o ../formatter/src/STIL/cJSON.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/6ec228e3/cJSON.o ../formatter/src/STIL/cJSON.c
 
-${OBJECTDIR}/_ext/1078767344/memwatch.o: ../formatter/src/memwatch.c 
-	${MKDIR} -p ${OBJECTDIR}/_ext/1078767344
+${OBJECTDIR}/_ext/bfb35110/memwatch.o: ../formatter/src/memwatch.c 
+	${MKDIR} -p ${OBJECTDIR}/_ext/bfb35110
 	${RM} "$@.d"
-	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/1078767344/memwatch.o ../formatter/src/memwatch.c
+	$(COMPILE.c) -g -DCOMMANDLINE -DMEMWATCH -Iinclude -I../formatter/include -I/usr/lib/jvm/java-7-openjdk-amd64/include -I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/linux -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/_ext/bfb35110/memwatch.o ../formatter/src/memwatch.c
 
 ${OBJECTDIR}/src/STIL.o: src/STIL.c 
 	${MKDIR} -p ${OBJECTDIR}/src

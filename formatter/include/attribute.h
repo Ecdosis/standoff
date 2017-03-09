@@ -20,6 +20,7 @@ char *attribute_prop_name( attribute *attr );
 char *attribute_get_value( attribute *attr );
 attribute *attribute_get_next( attribute *attr );
 int attribute_count( attribute *attr );
+/*void attribute_print_trails();*/
 #ifdef	__cplusplus
 }
 #endif

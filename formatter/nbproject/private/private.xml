@@ -17,7 +17,6 @@
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/range.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/matrix_queue.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/utils.c</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/memwatch.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/node.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/HTML.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/range_array.c</file>
@@ -33,6 +32,7 @@
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/master.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/file_list.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/css_property.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/dom.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/STIL.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/range.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/attribute.h</file>
@@ -42,7 +42,6 @@
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/main.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/node.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/text_buf.h</file>
-            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/cJSON.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/encoding.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/hashmap.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/STIL/STIL.h</file>
@@ -54,6 +53,7 @@
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/dom.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/STIL/memory.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/matrix.c</file>
+            <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/memwatch.h</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/queue.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/src/attribute.c</file>
             <file>file:/home/desmond/NetBeansProjects/standoff/formatter/include/css_parse.h</file>

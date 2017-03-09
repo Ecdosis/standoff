@@ -32,6 +32,9 @@
 #include "HTML.h"
 #include "error.h"
 #include "utils.h"
+#include "css_property.h"
+#include "css_selector.h"
+#include "css_rule.h"
 #include "memwatch.h"
 
 /** Record which properties may nest inside which other properties */
@@ -268,6 +271,40 @@ void matrix_update_html( matrix *m )
                     matrix_forbid( m, m->names[i], m->names[j] );
                     matrix_forbid( m, m->names[j], m->names[i] );
                     break;
+            }
+        }     
+    }
+}
+/**
+ * Revise the matrix, based on optional levels specified in the CSS
+ * @param m the matrix to update
+ * @param css_rules the css_rule map indexed by property name
+ */
+void matrix_update_level( matrix *m, hashmap *css_rules  )
+{
+    int i,j;
+    for ( i=0;i<m->n_props;i++ )
+    {
+        for ( j=0;j<m->n_props;j++ )
+        {
+            char *i_prop = m->names[i];
+            char *j_prop = m->names[j];
+            css_rule *i_rule = hashmap_get(css_rules,i_prop);
+            css_rule *j_rule = hashmap_get(css_rules,j_prop);
+            int res = html_is_inside(m->html_tags[i], m->html_tags[j]);
+            // IF the html data was inconclusive use the level data
+            if ( res == 0 && i_rule != NULL && j_rule != NULL )
+            {
+                if ( css_rule_get_level(i_rule)>css_rule_get_level(j_rule) )
+                {
+                    matrix_forbid( m, i_prop, j_prop );
+                    matrix_allow( m, j_prop, i_prop );
+                }
+                else if ( css_rule_get_level(j_rule)>css_rule_get_level(i_rule) )
+                {
+                    matrix_forbid( m, j_prop, i_prop );
+                    matrix_allow( m, i_prop, j_prop );
+                }
             }
         }     
     }

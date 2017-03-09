@@ -25,6 +25,9 @@
 #include "error.h"
 #include "utils.h"
 #include "memwatch.h"
+#include "hashmap.h"
+#include "log.h"
+#include "bigint.h"
 
 
 struct attribute_struct
@@ -35,6 +38,7 @@ struct attribute_struct
     char *prop_name;
     attribute *next;
 };
+/*static hashmap *trails = NULL;*/
 /**
  * Create an attribute
  * @param name its name
@@ -100,87 +104,125 @@ int attribute_append_value( attribute *attr, char *suffix )
     }
     else
     {
-        fprintf(stderr,"attribute: failed to copy attr\n");
+        log_add("attribute: failed to copy attr\n");
         return 0;
     }
 }
 /**
- * Convert a base 24 string to an int
- * @param str the string
- * @return its value
+ * Duplicate a string and concatenate it with another
+ * @param src the source string to copy
+ * @param suffix the suffix to append
+ * @return an allocated string caller to free
  */
-static int from_base_24( char *str )
+static char *dup_n_cat( char *src, char *suffix)
 {
-    int value = 0;
-    int i,len = strlen( str );
-    for ( i=0;i<len;i++ )
-    {
-        value *= 24;
-        value += str[i] - 'a';
-    }
-    return value;
+    char *dup = calloc( strlen(src)+strlen(suffix)+1, sizeof(char));
+    strcat( dup, src );
+    strcat( dup, suffix );
+    return dup;
 }
 /**
- * Compute the length of the string representing a base 24 number (a=0,aa=24)
- * @param value the int value
- * @return its string length
- */
-static int base_24_len( int value )
-{
-    int len = 0;
-    do
-    {
-        value = value/24;
-        len++;
-    }
-    while ( value > 0 );
-    return len;
-}
-/**
- * Convert a number to a base-24 string
- * @param value the number
- * @param dst the location for the string (must be large enough)
- */
-static void to_base_24( int value, char *dst )
-{
-    int len = base_24_len(value);
-    int i = len-1;
-    do
-    {
-        dst[i--] = value%24+'a';
-        value /= 24;
-    }
-    while ( value > 0 && i >= 0 );
-	dst[len] = 0;
-}
-/**
- * Increment a value by incrementing an *existing* suffix
- * @param attr the attribute in question
- * @return its value allocated (to be freed) with a new suffix
+ * Split an id into 2. instead of d10->d10a and d10b we use base 3 to obtain
+ * d10.1 and d10.2 (without the dots),and express thatin base27 for 
+ * compactness. Base27 has the property that 3 digits of base3 = one digit of 
+ * base 27. Since this splitting process is repeatable we will get alignment 
+ * of the left (d10... and the right (a10...) and the ids generated will be 
+ * unique. Previously, generating sequential ids (a01, 10b etc) failed because 
+ * the HTML was written out hierarchically so that you could get two 10bs.
+ * @param attr the id-attribute to split
+ * @return the id value of the next attribute
  */
 char *attribute_inc_value( attribute *attr )
 {
-    int i=strlen(attr->value)-1;
-    while ( i>0 )
+    int len = strlen(attr->value);
+    char *suffix = NULL;
+    int i;
+    for ( i=1;i<len;i++ )
     {
-        if ( attr->value[i-1]>='a'&&attr->value[i-1]<='z' )
-            i--;
-        else
+        if ( !isdigit(attr->value[i]) )
+        {
+            suffix = &attr->value[i];
             break;
+        }
     }
-    // so we're pointing to the first suffix char
-    char *suffix = &attr->value[i];
-    int base_len = strlen(attr->value)-strlen(suffix);
-    int old = from_base_24( suffix );
-    int new_suffix_len = base_24_len( old+1 );
-    char *new_value = calloc( base_len+new_suffix_len+1,sizeof(char) );
-    strncpy( new_value, attr->value, base_len );
-    to_base_24( old+1, &new_value[base_len] );
-    new_value[base_len+new_suffix_len] = 0;
-    return new_value;
+    if ( suffix==NULL )
+    {
+        // it's a bare id without any suffix e.g. "d10"
+        char *value_left = dup_n_cat(attr->value,"b");  // '1' in base 3
+        char *value_right = dup_n_cat(attr->value,"c"); // '2' in base 3
+        if ( value_left == NULL || value_right == NULL )
+        {   // prevent memory leaks!
+            if ( value_right!=NULL )
+                free(value_right);
+            if ( value_left != NULL )
+                free(value_left);
+            return NULL;
+        }
+        free( attr->value );
+        attr->value = value_left;
+        return value_right;
+    }
+    else
+    {
+        // we've already got some kind of suffix in base 27...
+        char *base3_num = trim_zeros(base27_to_base3(suffix));
+        if ( base3_num == NULL )
+            return NULL;
+        int len3 = strlen(base3_num);
+        char *suffix_left,*suffix_right;
+        if ( base3_num[len3-1] == '1' )
+        {
+            suffix_left = dup_n_cat(base3_num,"2");
+            suffix_right = dup_n_cat(base3_num,"1");
+        }
+        else
+        {
+            suffix_left = dup_n_cat(base3_num,"1");
+            suffix_right = dup_n_cat(base3_num,"2");
+        }
+        free( base3_num );
+        if ( suffix_left == NULL || suffix_right == NULL )
+        {
+            // avoid memory leaks in this unlikely case
+            if ( suffix_right!=NULL )
+                free(suffix_right);
+            if ( suffix_left != NULL )
+                free(suffix_left);
+            return NULL;
+        }
+        char *base27_left = base3_to_base27(suffix_left);
+        char *base27_right = base3_to_base27(suffix_right);
+        free( suffix_left );
+        free( suffix_right );
+        if ( base27_left == NULL || base27_right == NULL )
+        {
+            // avoid memory leaks in this unlikely case
+            if ( base27_right!=NULL )
+                free(base27_right);
+            if ( base27_left != NULL )
+                free(base27_left);
+            return NULL;
+        }
+        int base_len = (strlen(attr->value)-strlen(suffix));
+        char *value_left = calloc(base_len+1+strlen(base27_left),sizeof(char));
+        if ( value_left == NULL )
+            return NULL;
+        strncat(value_left,attr->value,base_len);
+        strcat(value_left,base27_left);
+        free( base27_left );
+        char *value_right = calloc(base_len+1+strlen(base27_right),sizeof(char));
+        if ( value_right == NULL )
+            return NULL;
+        strncat(value_right,attr->value,base_len);
+        strcat(value_right,base27_right);
+        free( base27_right );
+        free( attr->value);
+        attr->value = value_left;
+        return value_right;
+    }
 }
 /**
- * Clone an existing attribute
+ * Clone an existing attribute. If it's an id, renumber it.
  * @param attr the attribute to clone
  * @return the attribute or NULL
  */
@@ -191,12 +233,11 @@ attribute *attribute_clone( attribute *attr )
     {
         // inc suffix
         int vlen = strlen(attr->value);
-        int i = vlen-1;
-        while ( i > 0 && isalpha(attr->value[i]) )
-            i--;
         int res = 1;
-        if ( i == vlen-1 )
+        if ( vlen > 0 && isdigit(attr->value[vlen-1]) )
+        {
             res = attribute_append_value( attr, "a" );
+        }
         if ( res )
         {
             char *value = attribute_inc_value( attr );
@@ -206,13 +247,14 @@ attribute *attribute_clone( attribute *attr )
                 free( value );
             }
             else
-                fprintf(stderr,"attribute: failed to inc value\n");
+                log_add("attribute: failed to inc value\n");
         }
         else
-            fprintf(stderr,"attribute: failed to append value\n");
+            log_add("attribute: failed to append value\n");
     }
     else
         new_attr = attribute_create( attr->name, attr->prop_name, attr->value );
+    log_add("exited attribute_clone\n");
     return new_attr;
 }
 /**
